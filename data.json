@@ -1,0 +1,175 @@
+{
+  "user": { 
+    "name": "ARYAN", 
+    "cgpa": "7.0", 
+    "term": "JANUARY 2026 TERM", 
+    "date": "28 March, 2026" 
+  },
+  "courses": [
+    {
+      "id": "c1",
+      "title": "Statistics for Data Science II",
+      "code": "STATS20",
+      "type": "REPEAT FULL COURSE",
+      "program": "BS in Data Science and Applications",
+      "grades": [
+        { "label": "Week 1 Assignment", "score": 100 },
+        { "label": "Week 2 Assignment", "score": 93 },
+        { "label": "Week 1 Activity", "score": "Absent" },
+        { "label": "Quiz 1", "score": 29 }
+      ],
+      "questions": [
+        { 
+          "id": "q1", 
+          "text": "1) An experiment consists of rolling an unbiased die two times. The random variables $X_i \\sim \\text{Uniform}\\{1, 2, 3, 4, 5, 6\\}$, represent the number on the $i$-th roll, $i = 1, 2$. Calculate $f_{X_1,X_2}(3, 2)$.", 
+          "type": "radio", 
+          "options": ["$\\frac{1}{6}$", "$\\frac{1}{12}$", "$\\frac{1}{36}$", "$\\frac{1}{18}$"], 
+          "answer": 2,
+          "solution": "Since the rolls are independent, the joint probability is the product of the marginals: $\\frac{1}{6} \\times \\frac{1}{6} = \\frac{1}{36}$",
+          "points": 1
+        },
+        { 
+          "id": "q2", 
+          "text": "2) The joint probability mass function of two discrete random variables $X$ and $Y$ is given. Which of the following are possible values of $a$ and $b$?", 
+          "type": "checkbox", 
+          "options": ["$a = \\frac{1}{2}, b = 0$", "$a = \\frac{1}{4}, b = \\frac{1}{2}$", "$a = 1, b = 1$", "$a = \\frac{1}{8}, b = \\frac{3}{8}$"], 
+          "answer": [0],
+          "solution": "The sum of all probabilities must be equal to 1.",
+          "points": 1
+        }
+      ],
+      "modules": [
+        {
+          "id": "m1", 
+          "title": "Week 1: Joint Distributions", 
+          "items": [
+            { 
+              "id": "i1", 
+              "type": "video", 
+              "title": "L1.1: Joint PMF of two discrete random variables", 
+              "url": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+              "notes": "### Important Concepts\n\nThe Joint PMF $P(X=x, Y=y)$ must satisfy the following conditions:\n1. $0 \\le P(x,y) \\le 1$\n2. $\\sum_x \\sum_y P(x,y) = 1$\n\n> Note: Watch the video carefully to understand how to build the joint distribution table.\n\nHere is an inline code example: `P(X=1, Y=2) = 0.25`."
+            },
+            { 
+              "id": "i2", 
+              "type": "note", 
+              "title": "Reading: Marginal PMFs & Expectations",
+              "content": "## Introduction to Marginal Distributions\n\nWhen dealing with two discrete random variables, $X$ and $Y$, their joint behavior is described by the Joint Probability Mass Function (PMF), $P_{X,Y}(x,y)$. However, there are times when we want to isolate and understand the behavior of just one of these variables, ignoring the other. This isolated distribution is known as the **Marginal PMF**.\n\n> In probability theory and statistics, the marginal distribution of a subset of a collection of random variables is the probability distribution of the variables contained in the subset. It gives the probabilities of various values of the variables in the subset without reference to the values of the other variables.\n\n---\n\n## 1) Finding the Marginal Distribution\n\nTo find the marginal PMF of $X$, you must sum the joint probabilities over all possible values of $Y$. This process mathematically \"marginalizes out\" the variable $Y$.\n\n$$!P_X(x) = \\sum_{y \\in S_Y} P_{X,Y}(x,y)$$\n\nSimilarly, the marginal PMF of $Y$ is found by summing over all possible values of $X$:\n\n$$P_Y(y) = \\sum_{x \\in S_X} P_{X,Y}(x,y)$$\n\n### Step-by-Step Explanation\nHere is how you actually calculate the marginal PMF from a joint distribution table:\n\n1. **Identify the target variable:** Decide whether you are calculating the marginal PMF for $X$ (rows) or $Y$ (columns).\n2. **Locate the probability values:** Find the specific value of the target random variable you want to isolate (e.g., $X = 1$).\n3. **Summation:** Add together all intersection probabilities associated with your target value across the *other* dimension. For example, to find $P(X=1)$, sum all joint probabilities across row $X=1$.\n4. **Repeat:** Do this for every possible value defined in your variable's sample space.\n5. **Validation:** Verify that the sum of all your newly calculated marginal probabilities exactly equals 1.\n\n### Visualizing the Data (Table Approach)\n\nConsider the following joint distribution between $X$ and $Y$:\n\n| $X$ \\ $Y$ | $Y=0$ | $Y=1$ | $Y=2$ | **Marginal $P_X(x)$** |\n| :--- | :--- | :--- | :--- | :--- |\n| **$X=0$** | 0.1 | 0.2 | 0.0 | **0.3** |\n| **$X=1$** | 0.1 | 0.1 | 0.2 | **0.4** |\n| **$X=2$** | 0.0 | 0.1 | 0.2 | **0.3** |\n| **Marginal $P_Y(y)$** | **0.2** | **0.4** | **0.4** | **1.0** |\n\nNotice how the far-right column represents the marginal PMF of $X$, calculated by reading across rows. The bottom row represents the marginal PMF of $Y$, calculated by reading straight down the columns!\n\n---\n\n## 2) Key Properties of Marginals\nBefore calculating your expectations, verify the following core properties:\n* They represent a valid probability space on their own.\n* The isolated variables do *not* retain information about the other variables.\n* They can be utilized independently to formulate Marginal Expectations.\n\n---\n\n## 3) Python Implementation\n\nIf you are storing your joint PMF in a 2D numpy array where rows represent $X$ and columns represent $Y$, calculating the marginal distributions is simply a matter of summing across the correct axes.\n\n```python\nimport numpy as np\n\n# Example Joint PMF table (3x3)\njoint_pmf = np.array([\n    [0.1, 0.2, 0.0],\n    [0.1, 0.1, 0.2],\n    [0.0, 0.1, 0.2]\n])\n\n# Marginal PMF of X (sum over columns/Y)\npx = np.sum(joint_pmf, axis=1)\nprint(f\"P_X(x): {px}\")\n\n# Marginal PMF of Y (sum over rows/X)\npy = np.sum(joint_pmf, axis=0)\nprint(f\"P_Y(y): {py}\")\n```\n\nThe output will be `P_X(x): [0.3 0.4 0.3]` and `P_Y(y): [0.2 0.4 0.4]`. Notice how dealing with numpy axes makes marginalization trivial compared to manual summation."
+            },
+            { 
+              "id": "i3", 
+              "type": "activity", 
+              "title": "AQ1.1: Activity Question 1 - Not Graded",
+              "questions": [
+                {
+                  "id": "aq1_q1",
+                  "description": "If $X$ and $Y$ are independent random variables, what is $E[XY]$?",
+                  "options": ["$E[X] + E[Y]$ text-slate-800", "$E[X]E[Y]$ text-slate-800", "$E[X]/E[Y]$ text-slate-800", "$0$ text-slate-800"],
+                  "answer": 1,
+                  "solution": "By independence, the expectation of the product is the product of the expectations."
+                }
+              ]
+            },
+            {
+              "id": "i4",
+              "type": "quiz",
+              "title": "Mock Practice: Discrete Probability Spaces",
+              "examType": "Mock Practice",
+              "duration": 15,
+              "totalMarks": 15,
+              "submissionRule": "anytime",
+              "questions": [
+                {
+                  "id": "mp_q1",
+                  "description": "Suppose $X \\sim \\text{Poisson}(\\lambda)$. What is $P(X=0)$?",
+                  "options": ["$e^{-\\lambda}$", "$\\lambda e^{-\\lambda}$", "$1 - e^{-\\lambda}$", "$0$"],
+                  "answer": 0,
+                  "solution": "The Poisson PMF is $P(X=k) = \\frac{\\lambda^k e^{-\\lambda}}{k!}$. For $k=0$, $P(X=0) = \\frac{\\lambda^0 e^{-\\lambda}}{0!} = e^{-\\lambda}$."
+                },
+                {
+                  "id": "py_q1",
+                  "description": "Which of the following is an immutable data type in Python?",
+                  "options": ["List", "Dictionary", "Set", "Tuple"],
+                  "answer": 3,
+                  "solution": "In Python, Tuples are immutable, meaning their elements cannot be changed after they are created. Lists, Dictionaries, and Sets are mutable."
+                },
+                {
+                  "id": "py_q2",
+                  "description": "What is the output of `print(2 ** 3 ** 2)`?",
+                  "options": ["64", "512", "4096", "None of the above"],
+                  "answer": 1,
+                  "solution": "Exponentiation `**` is evaluated from right to left in Python. So, `2 ** 3 ** 2` is evaluated as `2 ** (3 ** 2)` -> `2 ** 9` -> `512`."
+                }
+              ]
+            },
+            {
+              "id": "i5",
+              "type": "quiz",
+              "title": "Quiz 1: Joint & Marginal Distributions",
+              "examType": "Quiz",
+              "duration": 30,
+              "totalMarks": 20,
+              "submissionRule": "auto_only",
+              "questions": [
+                {
+                  "id": "qz1_q1",
+                  "description": "Consider the joint PMF $f(x,y)=k(x+y)$ for $x,y \\in \\{1,2\\}$. Find the value of $k$.",
+                  "options": ["$1/12$", "$1/15$", "$1/18$", "$1/20$"],
+                  "answer": 0,
+                  "solution": "Summing probabilities: $k(1+1) + k(1+2) + k(2+1) + k(2+2) = k(2+3+3+4) = 12k = 1 \\Rightarrow k = 1/12$."
+                },
+                {
+                  "id": "ma_q1",
+                  "description": "What is the derivative of $f(x) = e^x$?",
+                  "options": ["$x \\cdot e^{x-1}$", "$e^x$", "$\\ln(x)$", "$\\frac{1}{x}$"],
+                  "answer": 1,
+                  "solution": "The exponential function $e^x$ is unique because its derivative is exactly itself. Therefore, $\\frac{d}{dx} e^x = e^x$."
+                }
+              ]
+            },
+            {
+              "id": "i6",
+              "type": "quiz",
+              "title": "Midterm Exam 2026: Statistics II",
+              "examType": "Term Exam",
+              "duration": 120,
+              "totalMarks": 100,
+              "submissionRule": "last_10_mins",
+              "questions": [
+                {
+                  "id": "mt_q1",
+                  "description": "Evaluate the limit: $$\\lim_{x \\to 0} \\frac{\\sin(x)}{x}$$",
+                  "options": ["$0$", "$1$", "$\\infty$", "Undefined"],
+                  "answer": 1,
+                  "solution": "This is a fundamental trigonometric limit. As $x$ approaches $0$, the value of $\\frac{\\sin(x)}{x}$ approaches $1$."
+                },
+                {
+                  "id": "ct_q1",
+                  "description": "Which of these is NOT a pillar of computational thinking?",
+                  "options": ["Decomposition", "Pattern Recognition", "Memorization", "Abstraction"],
+                  "answer": 2,
+                  "solution": "The 4 pillars of computational thinking are Decomposition, Pattern Recognition, Abstraction, and Algorithmic Thinking. Memorization is not one of them."
+                }
+              ]
+            },
+            {
+              "id": "i7",
+              "type": "assignment",
+              "title": "Graded Assignment 1.1: Expectations",
+              "questions": [
+                {
+                  "id": "ga_q1",
+                  "description": "Calculate $E[X^2]$ if $X \\sim \\text{Bernoulli}(p)$.",
+                  "options": ["$p^2$", "$p$", "$1-p$", "$2p$"],
+                  "answer": 1,
+                  "solution": "$E[X^2] = 1^2 \\cdot p + 0^2 \\cdot (1-p) = p$. Note that for Bernoulli, $E[X^k] = p$ for all $k \\ge 1$."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "whiteboardData": {}
+}
