@@ -7,10 +7,12 @@ const useStore = create((set) => ({
   loading: true,
   role: 'learner', // 'learner' or 'instructor'
   isSidebarCollapsed: false,
+  isEmbed: false,
   
   // Actions
   toggleSidebar: () => set((state) => ({ isSidebarCollapsed: !state.isSidebarCollapsed })),
   setRole: (role) => set({ role }),
+  setIsEmbed: (isEmbed) => set({ isEmbed }),
   
   fetchData: async () => {
     try {

@@ -10,11 +10,20 @@ import InstructorDashboard from './components/instructor/InstructorDashboard';
 import SyllabusBuilder from './components/instructor/SyllabusBuilder';
 
 function App() {
-  const { fetchData, loading, role } = useStore();
+  const { fetchData, loading, role, setIsEmbed } = useStore();
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+
+    // Detect Embed Mode
+    const params = new URLSearchParams(window.location.search);
+    const isEmbedParam = params.get('embed') === 'true';
+    const isIframe = window.self !== window.top;
+
+    if (isEmbedParam || isIframe) {
+      setIsEmbed(true);
+    }
+  }, [fetchData, setIsEmbed]);
 
   if (loading) {
     return (
