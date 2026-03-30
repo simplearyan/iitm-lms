@@ -34,8 +34,8 @@ function App() {
           {/* Index Route switches between Dashboard for Learner or Redirects Instructor to authoring */}
           <Route index element={role === 'learner' ? <LearnerDashboard /> : <Navigate to="/instructor" replace />} />
           
-          {/* Learner Course Route */}
-          <Route path="course/:courseId" element={<CourseViewer />} />
+          {/* Learner Course Route with Deep Linking support */}
+          <Route path="course/:courseId/:itemId?" element={<CourseViewer />} />
           
           {/* Instructor Routes */}
           <Route path="instructor">

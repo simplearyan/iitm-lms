@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useParams, Navigate, Link } from 'react-router-dom';
+import { useParams, Navigate, Link, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import useStore from '../../store/useStore';
 import { ChevronDown, ChevronRight, PlayCircle, FileText, CheckCircle2, ChevronLeft } from 'lucide-react';
 import NoteViewer from './NoteViewer';
@@ -7,15 +7,46 @@ import ActivityEngine from './ActivityEngine';
 import VideoViewer from './VideoViewer';
 
 export default function CourseViewer() {
-  const { courseId } = useParams();
+  const { courseId, itemId } = useParams();
+  const navigate = useNavigate();
   const { courses, isSidebarCollapsed } = useStore();
   const course = courses.find(c => c.id === courseId);
   
-  const initialModule = course?.modules?.[0];
-  const initialItem = initialModule?.items?.[0];
-  
-  const [activeItem, setActiveItem] = useState(initialItem || null);
-  const [expandedModules, setExpandedModules] = useState([initialModule?.id]);
+  const [expandedModules, setExpandedModules] = useState([]);
+  const [activeItem, setActiveItem] = useState(null);
+
+  // Sync activeItem and expandedModules with URL params
+  useEffect(() => {
+    if (!course) return;
+
+    let targetItem = null;
+    let targetModuleId = null;
+
+    if (itemId) {
+      // Find item in all modules
+      course.modules.forEach(m => {
+        const item = m.items.find(i => i.id === itemId);
+        if (item) {
+          targetItem = item;
+          targetModuleId = m.id;
+        }
+      });
+    }
+
+    if (!targetItem) {
+      // Fallback to first item if no itemId or item not found
+      const firstModule = course.modules?.[0];
+      targetItem = firstModule?.items?.[0];
+      targetModuleId = firstModule?.id;
+    }
+
+    if (targetItem) {
+      setActiveItem(targetItem);
+      if (targetModuleId && !expandedModules.includes(targetModuleId)) {
+        setExpandedModules(prev => [...new Set([...prev, targetModuleId])]);
+      }
+    }
+  }, [course, itemId]);
 
   if (!course) return <Navigate to="/" />;
 
@@ -70,7 +101,7 @@ export default function CourseViewer() {
                       return (
                         <button
                           key={item.id}
-                          onClick={() => setActiveItem(item)}
+                          onClick={() => navigate(`/course/${courseId}/${item.id}`)}
                           className={`w-full flex items-start text-left p-2.5 rounded-lg text-sm font-medium transition-all ${
                             isActive 
                               ? 'bg-indigo-100/50 text-indigo-700 shadow-sm border border-indigo-200/50 pointer-events-none' 
