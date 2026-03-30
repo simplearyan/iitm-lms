@@ -67,38 +67,41 @@ export default function Layout() {
                 <Menu size={24} strokeWidth={2.5} />
               </button>
               
-              <Link to="/" className="flex items-center gap-3 md:gap-4 group">
-                <div className="w-10 h-10 bg-[#7A1B1E] rounded-full flex items-center justify-center text-white font-black text-lg shadow-inner group-hover:scale-105 transition-transform">
+              <Link to="/" className="flex items-center gap-3 md:gap-4 group shrink-0">
+                <div className="w-10 h-10 bg-[#7A1B1E] rounded-full flex items-center justify-center text-white font-black text-lg shadow-inner group-hover:rotate-12 transition-transform shrink-0">
                   I
                 </div>
-                <span className="font-extrabold text-xl md:text-2xl text-slate-900 tracking-tight hidden sm:block">IIT Madras</span>
+                <span className="font-extrabold text-xl md:text-2xl text-slate-900 tracking-tight hidden lg:block uppercase">IIT Madras</span>
+                <span className="font-extrabold text-xl text-slate-900 tracking-tight lg:hidden uppercase">IITM</span>
               </Link>
             </div>
             
             <div className="flex items-center gap-4 md:gap-8">
               {/* View Switcher toggle */}
-              <div className="flex items-center bg-slate-100/80 p-1.5 rounded-xl border border-slate-200">
+              <div className="flex items-center bg-slate-100/80 p-1 rounded-xl border border-slate-200">
                 <button 
                   onClick={() => setRole('learner')}
-                  className={`px-4 py-2 text-xs md:text-sm font-bold rounded-lg transition-all ${role === 'learner' ? 'bg-white text-indigo-700 shadow-sm border border-slate-200' : 'text-slate-500 hover:text-slate-800 border border-transparent'}`}
+                  className={`px-3 py-1.5 md:px-4 md:py-2 text-[10px] md:text-sm font-bold rounded-lg transition-all ${role === 'learner' ? 'bg-white text-indigo-700 shadow-sm border border-slate-200' : 'text-slate-500 hover:text-slate-800 border border-transparent'}`}
                 >
-                  Learner
+                  <span className="md:hidden">L</span>
+                  <span className="hidden md:inline">Learner</span>
                 </button>
                 <button 
                   onClick={() => setRole('instructor')}
-                  className={`px-4 py-2 text-xs md:text-sm font-bold rounded-lg transition-all ${role === 'instructor' ? 'bg-white text-orange-600 shadow-sm border border-slate-200' : 'text-slate-500 hover:text-slate-800 border border-transparent'}`}
+                  className={`px-4 py-2 md:px-4 md:py-2 text-[10px] md:text-sm font-bold rounded-lg transition-all ${role === 'instructor' ? 'bg-white text-orange-600 shadow-sm border border-slate-200' : 'text-slate-500 hover:text-slate-800 border border-transparent'}`}
                 >
-                  Instructor
+                  <span className="md:hidden">I</span>
+                  <span className="hidden md:inline">Instructor</span>
                 </button>
               </div>
   
-              {/* Profile Tools */}
-              <div className="hidden lg:flex items-center gap-3 text-slate-700 font-bold text-sm bg-slate-50 border border-slate-200 px-4 py-2 rounded-xl">
+              {/* Profile Tools (Desktop/Large Only) */}
+              <div className="hidden xl:flex items-center gap-3 text-slate-700 font-bold text-sm bg-slate-50 border border-slate-200 px-4 py-2 rounded-xl">
                 <span className="uppercase tracking-widest text-[#7A1B1E]">Student Demo</span>
                 <User size={18} className="text-slate-400" />
               </div>
               
-              <button className="hidden md:flex text-slate-600 hover:text-slate-900 font-bold items-center gap-1.5 text-sm uppercase tracking-wider">
+              <button className="hidden lg:flex text-slate-600 hover:text-slate-900 font-bold items-center gap-1.5 text-sm uppercase tracking-wider">
                 Updates <div className="w-2 h-2 bg-indigo-500 rounded-full mb-3 ml-0.5"></div>
               </button>
               

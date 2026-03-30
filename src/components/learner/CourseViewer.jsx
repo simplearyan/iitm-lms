@@ -1,7 +1,7 @@
 import { useParams, Navigate, Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import useStore from '../../store/useStore';
-import { ChevronDown, ChevronRight, PlayCircle, FileText, CheckCircle2, ChevronLeft, Share2, X } from 'lucide-react';
+import { ChevronDown, ChevronRight, PlayCircle, FileText, CheckCircle2, ChevronLeft, Share2, X, Menu } from 'lucide-react';
 import NoteViewer from './NoteViewer';
 import ActivityEngine from './ActivityEngine';
 import VideoViewer from './VideoViewer';
@@ -15,6 +15,7 @@ export default function CourseViewer() {
   const [expandedModules, setExpandedModules] = useState([]);
   const [activeItem, setActiveItem] = useState(null);
   const [showEmbedModal, setShowEmbedModal] = useState(false);
+  const [isMobileSyllabusOpen, setIsMobileSyllabusOpen] = useState(false);
 
   // Sync activeItem and expandedModules with URL params
   useEffect(() => {
@@ -43,6 +44,7 @@ export default function CourseViewer() {
 
     if (targetItem) {
       setActiveItem(targetItem);
+      setIsMobileSyllabusOpen(false); // Auto-close on selection
       if (targetModuleId && !expandedModules.includes(targetModuleId)) {
         setExpandedModules(prev => [...new Set([...prev, targetModuleId])]);
       }
@@ -69,11 +71,20 @@ export default function CourseViewer() {
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-full w-full bg-slate-50 overflow-hidden relative">
-      {/* Course Sidebar */}
+    <div className="flex flex-col md:flex-row h-[calc(100vh-72px)] w-full bg-slate-50 overflow-hidden relative">
+      {/* Course Sidebar (Desktop) / Drawer (Mobile) */}
       {!isEmbed && (
-        <aside className={`flex flex-col border-slate-200 bg-white/50 shrink-0 h-[40vh] md:h-full z-10 transition-all duration-300 ease-in-out overflow-hidden ${isSidebarCollapsed ? 'w-0 opacity-0 border-none' : 'border-r w-full md:w-80 opacity-100 flex-[0_0_auto]'}`}>
-        <div className="w-full md:w-80 flex flex-col h-full min-w-full md:min-w-[320px]">
+        <aside className={`
+          fixed inset-0 z-40 bg-black/40 backdrop-blur-sm md:relative md:bg-transparent md:backdrop-blur-none
+          transition-all duration-300 ease-in-out
+          ${isMobileSyllabusOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none md:opacity-100 md:pointer-events-auto'}
+        `} onClick={() => setIsMobileSyllabusOpen(false)}>
+          <div className={`
+            flex flex-col border-r border-slate-200 bg-white shrink-0 h-full w-[85%] max-w-[320px] md:w-80 
+            transition-transform duration-300 ease-in-out transform
+            ${isMobileSyllabusOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+            ${isSidebarCollapsed ? 'md:w-0 md:-translate-x-full' : ''}
+          `} onClick={e => e.stopPropagation()}>
           {/* Header */}
           <div className="p-4 md:p-6 border-b border-slate-200 shrink-0 bg-white">
             <Link to="/" className="inline-flex items-center text-xs font-bold text-slate-500 hover:text-indigo-600 mb-3 uppercase tracking-wider transition-colors">
@@ -128,7 +139,24 @@ export default function CourseViewer() {
       )}
 
       {/* Main Content Pane */}
-      <section className="flex-1 flex flex-col h-[60vh] md:h-full relative bg-white">
+      <section className="flex-1 flex flex-col h-full relative bg-white min-w-0">
+        
+        {/* Mobile Toolbar (Visible only on small screens) */}
+        {!isEmbed && (
+          <div className="md:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-slate-100 shrink-0 z-20">
+            <button 
+              onClick={() => setIsMobileSyllabusOpen(true)}
+              className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200"
+            >
+              <Menu size={16} />
+              Syllabus
+            </button>
+            
+            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter truncate max-w-[150px]">
+              {activeItem?.title}
+            </div>
+          </div>
+        )}
         {!activeItem ? (
           <div className="flex-1 flex items-center justify-center text-slate-400 font-medium">
             Select a learning item to begin.
@@ -138,20 +166,21 @@ export default function CourseViewer() {
             
             {/* Universal Actions Bar (Floating/Fixed at top right) */}
             {!isEmbed && (
-              <div className="absolute top-6 right-6 z-30">
+              <div className="absolute top-4 right-4 md:top-6 md:right-6 z-30">
                 <button 
                   onClick={() => setShowEmbedModal(true)}
-                  className="flex items-center gap-2 px-4 py-2 bg-white/90 backdrop-blur border border-slate-200 rounded-xl text-xs font-bold text-slate-500 hover:text-indigo-600 hover:border-indigo-200 transition-all shadow-md hover:shadow-lg active:scale-95"
+                  className="flex items-center gap-2 px-2 py-1.5 md:px-4 md:py-2 bg-white/90 backdrop-blur border border-slate-200 rounded-xl text-[10px] md:text-xs font-bold text-slate-500 hover:text-indigo-600 hover:border-indigo-200 transition-all shadow-md hover:shadow-lg active:scale-95"
                 >
-                  <Share2 size={16} />
-                  EMBED NOTE
+                  <Share2 size={14} className="md:w-4 md:h-4" />
+                  <span className="hidden sm:inline">EMBED NOTE</span>
+                  <span className="sm:hidden">EMBED</span>
                 </button>
               </div>
             )}
 
             {/* Context Header (Visible for Quiz/Term Exam/Assignments) */}
             {activeItem.type !== 'activity' && activeItem.type !== 'video' && activeItem.type !== 'note' && (
-              <div className="m-14 mb-8 border-b pb-6 border-slate-100 pr-32">
+              <div className="m-6 md:m-14 mb-8 border-b pb-6 border-slate-100 pr-16 md:pr-32">
                  <div className="text-xs font-bold tracking-widest text-slate-400 uppercase mb-3 flex items-center gap-2">
                    <span>{currentModule?.title}</span>
                    <span className="w-1 h-1 rounded-full bg-slate-300"></span>
