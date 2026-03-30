@@ -4,7 +4,7 @@ import WhiteboardOverlay from '../shared/WhiteboardOverlay';
 import katex from 'katex';
 import { 
   PenTool, CheckCircle2, ChevronRight, ChevronLeft, Bookmark, 
-  Trash, MousePointer2, Minus, Circle, Square, MoveRight, Eraser, Triangle, Activity 
+  Trash, MousePointer2, Minus, Circle, Square, MoveRight, Eraser, Triangle, Activity, X 
 } from 'lucide-react';
 
 const renderMathText = (text) => {
@@ -29,6 +29,7 @@ export default function ActivityEngine({ item, course }) {
   // New states for the activity (like marked for review, tracking visits)
   const [visited, setVisited] = useState({});
   const [review, setReview] = useState({});
+  const [isPaletteOpen, setIsPaletteOpen] = useState(false);
 
   // Toolbar state (replicated directly from Classroom Preview)
   const [wbTool, setWbTool] = useState('pointer');
@@ -49,6 +50,7 @@ export default function ActivityEngine({ item, course }) {
   const navigateQuestion = (idx) => {
      setVisited(prev => ({...prev, [questions[idx].id]: true}));
      setCurrentQIndex(idx);
+     setIsPaletteOpen(false); // Auto-close on mobile
   };
 
   const getStatus = (qId) => {
@@ -86,9 +88,17 @@ export default function ActivityEngine({ item, course }) {
   const notVisitedCount = questions.length - visitedCount;
 
   return (
-    <div className="w-full h-full flex flex-col animate-fade-in relative bg-slate-50">
+    <div className="w-full h-full flex flex-col animate-fade-in relative bg-slate-50 overflow-hidden">
       
-      <div className="flex flex-col md:flex-row gap-4 md:gap-6 flex-1 h-full p-4 overflow-hidden">
+      {/* Mobile Floating Palette Trigger */}
+      <button 
+        onClick={() => setIsPaletteOpen(true)}
+        className="md:hidden fixed bottom-24 right-5 z-40 bg-slate-900 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center border-4 border-slate-50 transition-transform active:scale-95"
+      >
+        <Activity size={24} />
+      </button>
+
+      <div className="flex flex-col md:flex-row gap-4 md:gap-6 flex-1 h-full p-2 md:p-4 lg:p-6 overflow-hidden">
           
           {/* Main Question Column */}
           <div className="flex-1 flex flex-col bg-white overflow-hidden shadow-sm border border-slate-200 rounded-2xl relative min-h-[400px] select-none">
@@ -162,10 +172,10 @@ export default function ActivityEngine({ item, course }) {
              </div>
 
              {/* Integrated Drawing Toolbar matching the Mock */}
-             <div className="border-t border-slate-200 shrink-0 bg-slate-50 px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4 z-30">
+             <div className="border-t border-slate-200 shrink-0 bg-slate-50 p-3 md:px-6 md:py-4 flex flex-col lg:flex-row justify-between items-center gap-3 md:gap-4 z-30">
                  
-                 <div className="flex items-center space-x-2 md:space-x-4">
-                     <div className="flex flex-wrap gap-1 bg-white p-1 rounded-lg border border-slate-200 max-w-[210px] sm:max-w-none">
+                 <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
+                     <div className="flex flex-wrap items-center justify-center gap-1 bg-white p-1 rounded-xl border border-slate-200 w-full sm:w-auto">
                          <button onClick={() => setWbTool('pointer')} className={`p-1.5 md:p-2 rounded-md transition-colors border ${wbTool==='pointer'?'bg-indigo-100 border-indigo-300 text-indigo-700':'bg-transparent border-transparent text-slate-500 hover:bg-slate-100'}`} title="Pointer (Interact)"><MousePointer2 className="w-4 h-4 md:w-5 md:h-5"/></button>
                          <button onClick={() => setWbTool('pen')} className={`p-1.5 md:p-2 rounded-md transition-colors border ${wbTool==='pen'?'bg-indigo-100 border-indigo-300 text-indigo-700':'bg-transparent border-transparent text-slate-500 hover:bg-slate-100'}`} title="Pen"><PenTool className="w-4 h-4 md:w-5 md:h-5"/></button>
                          <button onClick={() => setWbTool('eraser')} className={`p-1.5 md:p-2 rounded-md transition-colors border ${wbTool==='eraser'?'bg-indigo-100 border-indigo-300 text-indigo-700':'bg-transparent border-transparent text-slate-500 hover:bg-slate-100'}`} title="Eraser"><Eraser className="w-4 h-4 md:w-5 md:h-5"/></button>
@@ -205,97 +215,113 @@ export default function ActivityEngine({ item, course }) {
                  </button>
              </div>
 
-             {/* Exam Controls Footer */}
-             <div className="bg-white border-t border-slate-200 p-4 grid grid-cols-2 md:grid-cols-4 md:flex justify-between items-center gap-3 shrink-0 z-30 relative">
-                 <div className="col-span-2 md:col-span-1 flex space-x-3 w-full md:w-auto">
+             {/* Exam Controls Footer - Optimized for Thumb Reach */}
+             <div className="bg-white border-t border-slate-200 p-3 md:p-4 flex flex-col-reverse md:flex-row justify-between items-stretch md:items-center gap-3 shrink-0 z-30 relative">
+                 <div className="flex space-x-2 w-full md:w-auto">
                      <button 
                          onClick={() => setReview(p => ({...p, [question.id]: !review[question.id]}))}
-                         className={`flex-1 md:flex-none px-4 py-2.5 border rounded-xl font-bold text-sm transition-colors flex items-center justify-center ${
+                         className={`flex-1 md:flex-none px-4 py-3 md:py-2.5 border rounded-xl font-bold text-[10px] md:text-sm transition-colors flex items-center justify-center ${
                              review[question.id] 
                              ? 'bg-amber-400 border-amber-500 text-amber-900 shadow-inner' 
                              : 'bg-white border-amber-400 text-amber-600 hover:bg-amber-50'
                          }`}
                      >
-                         <Bookmark className="w-4 h-4 mr-2" /> 
-                         <span>{review[question.id] ? 'Unmark Review' : 'Mark Review'}</span>
+                         <Bookmark className="w-3.5 h-3.5 md:w-4 md:h-4 mr-1.5 md:mr-2" /> 
+                         <span>{review[question.id] ? 'REMARK' : 'REVIEW'}</span>
                      </button>
                      <button 
                          onClick={() => setActivityProgress(question.id, undefined)}
-                         className="px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-600 text-sm font-bold hover:bg-slate-50 transition-colors"
+                         className="flex-1 md:flex-none px-4 py-3 md:py-2.5 bg-white border border-slate-300 rounded-xl text-slate-600 text-[10px] md:text-sm font-bold hover:bg-slate-50 transition-colors"
                      >
-                         Clear
+                         CLEAR
                      </button>
                  </div>
                  
-                 <div className="col-span-2 md:col-span-1 flex space-x-3 w-full md:w-auto md:justify-end">
+                 <div className="flex space-x-2 w-full md:w-auto">
                      <button 
                          onClick={() => navigateQuestion(currentQIndex - 1)}
                          disabled={currentQIndex === 0}
-                         className="flex-1 md:flex-none px-5 py-2.5 border border-slate-300 rounded-xl text-slate-700 font-bold hover:bg-slate-50 disabled:opacity-40 text-sm flex items-center justify-center bg-white transition-colors"
+                         className="flex-1 md:flex-none px-4 py-3 md:py-2.5 border border-slate-300 rounded-xl text-slate-700 font-bold hover:bg-slate-50 disabled:opacity-40 text-[10px] md:text-sm flex items-center justify-center bg-white transition-colors"
                      >
-                         <ChevronLeft className="w-4 h-4 mr-1.5" /> Prev
+                         <ChevronLeft className="w-3.5 h-3.5 md:w-4 md:h-4 mr-1 md:mr-1.5" /> PREV
                      </button>
                      
                      {currentQIndex === questions.length - 1 ? (
-                        <button className="flex-1 md:flex-none px-6 py-2.5 bg-[#7A1B1E] hover:bg-red-900 text-white rounded-xl font-bold text-sm flex items-center justify-center shadow-md shadow-red-900/20 transition-all">
-                            Submit Assessment
+                        <button className="flex-1 md:flex-none px-6 py-3 md:py-2.5 bg-[#7A1B1E] hover:bg-red-900 text-white rounded-xl font-black text-[10px] md:text-sm flex items-center justify-center shadow-md shadow-red-900/20 transition-all uppercase tracking-widest">
+                            SUBMIT
                         </button>
                      ) : (
                         <button 
                             onClick={() => navigateQuestion(currentQIndex + 1)}
-                            className="flex-1 md:flex-none px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm flex items-center justify-center shadow-md shadow-emerald-600/20 transition-all"
+                            className="flex-2 md:flex-none px-6 py-3 md:py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-[10px] md:text-sm flex items-center justify-center shadow-md shadow-emerald-600/20 transition-all uppercase tracking-widest grow"
                         >
-                            Save & Next <ChevronRight className="w-4 h-4 ml-1.5" />
+                            NEXT <ChevronRight className="w-3.5 h-3.5 md:w-4 md:h-4 ml-1 md:mr-1.5" />
                         </button>
                      )}
                  </div>
              </div>
           </div>
 
-          {/* Right Palette Column */}
-          <div className="w-full md:w-80 flex flex-col shrink-0 space-y-4 rounded-2xl h-full overflow-y-auto hide-scroll">
-             
-             {/* Info Panel */}
-             <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                 <h4 className="text-xs font-black text-slate-500 mb-4 uppercase tracking-widest text-center">Status Legend</h4>
-                 <div className="grid grid-cols-2 gap-y-3 gap-x-2 text-[10px] font-bold text-slate-600">
-                     <div className="flex items-center"><span className="w-5 h-5 rounded-full bg-emerald-500 text-white flex justify-center items-center mr-2 text-xs shadow-sm">{answeredCount - answeredReviewCount}</span> Answered</div>
-                     <div className="flex items-center"><span className="w-5 h-5 rounded-full bg-red-500 text-white flex justify-center items-center mr-2 text-xs shadow-sm">{trueUnanswered}</span> Not Ans</div>
-                     <div className="flex items-center"><span className="w-5 h-5 rounded-full bg-slate-100 border border-slate-300 text-slate-500 flex justify-center items-center mr-2 text-xs">{notVisitedCount}</span> Not Visit</div>
-                     <div className="flex items-center"><span className="w-5 h-5 rounded-full bg-amber-400 text-amber-900 flex justify-center items-center mr-2 text-xs shadow-sm">{reviewCount}</span> Review</div>
-                     <div className="flex items-center col-span-2"><span className="w-5 h-5 rounded-full bg-emerald-500 border-2 border-amber-400 text-white flex justify-center items-center mr-2 text-xs shadow-sm">{answeredReviewCount}</span> Answered & Review</div>
-                 </div>
-             </div>
-
-             {/* Question Grid */}
-             <div className="bg-white border border-slate-200 rounded-2xl p-5 flex-1 shadow-sm h-full">
-               <h4 className="text-xs font-black text-slate-500 mb-4 uppercase tracking-widest border-b border-slate-100 pb-2">Palette</h4>
-               <div className="grid grid-cols-5 gap-2 justify-items-center">
-                 {questions.map((q, idx) => {
-                   const status = getStatus(q.id);
-                   let btnClass = "w-10 h-10 rounded-full flex items-center justify-center text-[13px] font-black cursor-pointer transition-all border-2 ";
-                   
-                   if (status === 'answered') btnClass += "bg-emerald-500 text-white border-emerald-600 shadow-sm";
-                   else if (status === 'unanswered') btnClass += "bg-red-500 text-white border-red-600 shadow-sm";
-                   else if (status === 'review') btnClass += "bg-amber-400 text-amber-900 border-amber-500 shadow-sm";
-                   else if (status === 'answered-review') btnClass += "bg-emerald-500 text-white border-2 border-amber-400 ring-2 ring-amber-400 ring-inset shadow-sm";
-                   else btnClass += "bg-white text-slate-600 border-slate-300 hover:bg-slate-100";
-
-                   if (currentQIndex === idx) btnClass += " ring-2 ring-offset-2 ring-slate-800 scale-110";
-
-                   return (
-                     <button 
-                       key={q.id}
-                       onClick={() => navigateQuestion(idx)}
-                       className={btnClass}
-                     >
-                       {idx + 1}
-                     </button>
-                   );
-                 })}
+          {/* Right Palette Column (Desktop) / Drawer (Mobile) */}
+          <aside className={`
+            fixed inset-0 z-50 bg-black/40 backdrop-blur-sm md:relative md:bg-transparent md:backdrop-blur-none
+            transition-all duration-300 ease-in-out
+            ${isPaletteOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none md:opacity-100 md:pointer-events-auto'}
+          `} onClick={() => setIsPaletteOpen(false)}>
+            <div className={`
+              w-[85%] max-w-[320px] md:w-80 flex flex-col shrink-0 space-y-4 rounded-l-2xl md:rounded-2xl h-full bg-slate-50 p-4 md:p-0 ml-auto md:ml-0
+              transition-transform duration-300 ease-in-out transform
+              ${isPaletteOpen ? 'translate-x-0' : 'translate-x-full md:translate-x-0'}
+            `} onClick={e => e.stopPropagation()}>
+               
+               {/* Mobile Header for Drawer */}
+               <div className="md:hidden flex items-center justify-between mb-2">
+                  <h4 className="font-black text-slate-800 uppercase tracking-widest text-sm">Question Palette</h4>
+                  <button onClick={() => setIsPaletteOpen(false)} className="p-2 text-slate-400"><X size={20}/></button>
                </div>
-             </div>
-          </div>
+
+               {/* Info Panel */}
+               <div className="bg-white border border-slate-200 rounded-2xl p-4 md:p-5 shadow-sm shrink-0">
+                   <h4 className="text-[10px] font-black text-slate-400 mb-4 uppercase tracking-widest text-center">Status Legend</h4>
+                   <div className="grid grid-cols-2 gap-y-3 gap-x-2 text-[9px] md:text-[10px] font-black text-slate-500">
+                       <div className="flex items-center"><span className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-emerald-500 text-white flex justify-center items-center mr-2 text-[10px] shadow-sm">{answeredCount - answeredReviewCount}</span> Answered</div>
+                       <div className="flex items-center"><span className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-red-500 text-white flex justify-center items-center mr-2 text-[10px] shadow-sm">{trueUnanswered}</span> Not Ans</div>
+                       <div className="flex items-center"><span className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-slate-100 border border-slate-300 text-slate-500 flex justify-center items-center mr-2 text-[10px]">{notVisitedCount}</span> Not Visit</div>
+                       <div className="flex items-center"><span className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-amber-400 text-amber-900 flex justify-center items-center mr-2 text-[10px] shadow-sm">{reviewCount}</span> Review</div>
+                       <div className="flex items-center col-span-2"><span className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-emerald-500 border-2 border-amber-400 text-white flex justify-center items-center mr-2 text-[10px] shadow-sm">{answeredReviewCount}</span> Ans & Review</div>
+                   </div>
+               </div>
+  
+               {/* Question Grid */}
+               <div className="bg-white border border-slate-200 rounded-2xl p-4 md:p-5 flex-1 shadow-sm overflow-y-auto">
+                 <h4 className="text-[10px] font-black text-slate-400 mb-4 uppercase tracking-widest border-b border-slate-100 pb-2">Palette</h4>
+                 <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 justify-items-center">
+                   {questions.map((q, idx) => {
+                     const status = getStatus(q.id);
+                     let btnClass = "w-10 h-10 rounded-full flex items-center justify-center text-[12px] md:text-[13px] font-black cursor-pointer transition-all border-2 ";
+                     
+                     if (status === 'answered') btnClass += "bg-emerald-500 text-white border-emerald-600 shadow-sm";
+                     else if (status === 'unanswered') btnClass += "bg-red-500 text-white border-red-600 shadow-sm";
+                     else if (status === 'review') btnClass += "bg-amber-400 text-amber-900 border-amber-500 shadow-sm";
+                     else if (status === 'answered-review') btnClass += "bg-emerald-500 text-white border-2 border-amber-400 ring-2 ring-amber-400 shadow-sm";
+                     else btnClass += "bg-white text-slate-600 border-slate-300 hover:bg-slate-100";
+  
+                     if (currentQIndex === idx) btnClass += " ring-2 ring-offset-2 ring-slate-800 scale-110";
+  
+                     return (
+                       <button 
+                         key={q.id}
+                         onClick={() => navigateQuestion(idx)}
+                         className={btnClass}
+                       >
+                         {idx + 1}
+                       </button>
+                     );
+                   })}
+                 </div>
+               </div>
+            </div>
+          </aside>
       </div>
     </div>
   );
