@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pen, Eraser, Square, Circle, Triangle, MoveRight, Baseline, RotateCcw, X, Edit3 } from 'lucide-react';
+import { Pen, Eraser, Square, Circle, Triangle, Minus, ArrowRight, MousePointer2, Baseline, RotateCcw, X, Edit3 } from 'lucide-react';
 
 export default function FloatingAnnotationToolbar({
   isAnnotationMode,
@@ -11,14 +11,15 @@ export default function FloatingAnnotationToolbar({
   onClear
 }) {
   const tools = [
-    { id: 'pen', icon: <Pen className="w-4 h-4"/>, label: 'Pen' },
-    { id: 'line', icon: <MoveRight className="w-4 h-4"/>, label: 'Line' },
-    { id: 'arrow', icon: <MoveRight className="w-4 h-4"/>, label: 'Arrow' },
-    { id: 'rectangle', icon: <Square className="w-4 h-4"/>, label: 'Rectangle' },
-    { id: 'ellipse', icon: <Circle className="w-4 h-4"/>, label: 'Ellipse' },
-    { id: 'triangle', icon: <Triangle className="w-4 h-4"/>, label: 'Triangle' },
-    { id: 'graph', icon: <Baseline className="w-4 h-4"/>, label: 'Graph Axes' },
-    { id: 'eraser', icon: <Eraser className="w-4 h-4"/>, label: 'Eraser' }
+    { id: 'pointer', icon: <MousePointer2 className="w-4 h-4 md:w-5 md:h-5"/>, label: 'Pointer (Interact)' },
+    { id: 'pen', icon: <Pen className="w-4 h-4 md:w-5 md:h-5"/>, label: 'Pen' },
+    { id: 'line', icon: <Minus className="w-4 h-4 md:w-5 md:h-5"/>, label: 'Line' },
+    { id: 'arrow', icon: <ArrowRight className="w-4 h-4 md:w-5 md:h-5"/>, label: 'Arrow' },
+    { id: 'rectangle', icon: <Square className="w-4 h-4 md:w-5 md:h-5"/>, label: 'Rectangle' },
+    { id: 'ellipse', icon: <Circle className="w-4 h-4 md:w-5 md:h-5"/>, label: 'Ellipse' },
+    { id: 'triangle', icon: <Triangle className="w-4 h-4 md:w-5 md:h-5"/>, label: 'Triangle' },
+    { id: 'graph', icon: <Baseline className="w-4 h-4 md:w-5 md:h-5"/>, label: 'Graph Axes' },
+    { id: 'eraser', icon: <Eraser className="w-4 h-4 md:w-5 md:h-5"/>, label: 'Eraser' }
   ];
 
   const colors = ['#dc2626', '#16a34a', '#2563eb', '#4f46e5', '#9333ea', '#eab308', '#0f172a'];
@@ -41,7 +42,7 @@ export default function FloatingAnnotationToolbar({
     <div className="fixed bottom-4 right-4 md:bottom-8 md:right-8 flex flex-col gap-3 items-end z-50 animate-in slide-in-from-bottom-5 fade-in duration-200">
       
       {/* Tool Palette Mobile Responsive Wrap */}
-      <div className="bg-white/95 backdrop-blur-md shadow-2xl rounded-2xl p-3 border border-slate-200/80 w-[calc(100vw-32px)] md:w-auto max-w-sm flex flex-col gap-3 relative origin-bottom-right">
+      <div className="bg-white/95 backdrop-blur-md shadow-2xl rounded-2xl p-3 border border-slate-200/80 w-[calc(100vw-32px)] md:w-auto max-w-[95vw] md:max-w-none flex flex-col gap-3 relative origin-bottom-right">
         
         {/* Color Palette Row */}
         <div className="flex justify-between md:justify-center items-center gap-1 md:gap-3 bg-slate-50/80 rounded-xl border border-slate-100 p-2 overflow-x-auto hide-scroll">

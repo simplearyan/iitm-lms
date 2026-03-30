@@ -70,7 +70,7 @@ export default function VideoViewer({ item, currentModule }) {
                />
                
                {/* Visual indicator when annotation mode is locked */}
-               {isAnnotationMode && (
+               {isAnnotationMode && currentTool !== 'pointer' && (
                    <div className="absolute top-4 right-4 bg-indigo-600/90 text-white text-xs font-bold px-3 py-1.5 rounded-full z-30 shadow flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full bg-red-400 animate-pulse"></div> Drawing Mode Active
                    </div>
