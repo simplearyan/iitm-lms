@@ -1,16 +1,51 @@
-# React + Vite
+# 🎓 IITM Unified LMS: Assessment & Examination Engine
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, high-fidelity Learning Management System (LMS) mockup tailored for the IIT Madras BS Degree environment. This project focuses on a seamless transition between **Instructor Authoring** and **Learner Examination** experiences.
 
-Currently, two official plugins are available:
+![IITM Logo](https://www.iitm.ac.in/sites/default/files/iitm-logo_0.png)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🚀 Core Features
 
-## React Compiler
+### 🛠️ Instructor Dashboard (Authoring)
+- **Syllabus Builder**: Drag-and-drop style module management.
+- **Unified Assessment Creator**: Build Assignments, Quizzes, and Mock Exams from a single interface.
+- **Live Markdown & LaTeX Previews**: Real-time rendering of complex mathematical formulas using KaTeX.
+- **Assessment Configuration**: Set granular rules for duration, total marks, and submission policies (Strict vs. Open).
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 📖 Learner Experience (Exam Engine)
+- **High-Stakes Exam UI**: Inspired by the IITM Exam-Portal for a familiar student experience.
+- **Integrated Whiteboard**: Question-specific scratchpad for manual calculations.
+- **Real-Time Progress Tracking**: Visual palette indicating answered, flagged, and unvisited questions.
+- **Responsive Theme**: sleek dark/light mode integration for focused study sessions.
 
-## Expanding the ESLint configuration
+## 🛠️ Tech Stack
+- **Framework**: Vite + React 19
+- **State Management**: Zustand
+- **Styling**: Tailwind CSS 4
+- **Rendering**: Marked (Markdown), KaTeX (Math), Rough.js (Hand-drawn Whiteboard)
+- **Icons**: Lucide React
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 📦 Getting Started
+
+### Prerequisites
+- Node.js (v18 or higher)
+- npm or yarn
+
+### Installation
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+## 🚢 Deployment
+This project is configured for automated deployment to **GitHub Pages** via GitHub Actions. Every push to the `main` branch triggers a build and deploy cycle.
+
+Verification: `base: './'` is preset in `vite.config.js` for perfect subfolder routing.
+
+---
+*Created with ❤️ for the IITM BS Degree Community.*
