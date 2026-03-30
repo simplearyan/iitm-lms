@@ -1,0 +1,72 @@
+{
+  "user": { 
+    "name": "ARYAN", 
+    "cgpa": "7.0", 
+    "term": "JANUARY 2026 TERM", 
+    "date": "28 March, 2026" 
+  },
+  "courses": [
+    {
+      "id": "c1",
+      "title": "Statistics for Data Science II",
+      "code": "STATS20",
+      "type": "REPEAT FULL COURSE",
+      "program": "BS in Data Science and Applications",
+      "grades": [
+        { "label": "Week 1 Assignment", "score": 100 },
+        { "label": "Week 2 Assignment", "score": 93 },
+        { "label": "Week 1 Activity", "score": "Absent" },
+        { "label": "Quiz 1", "score": 29 }
+      ],
+      "questions": [
+        { 
+          "id": "q1", 
+          "text": "1) An experiment consists of rolling an unbiased die two times. The random variables $X_i \\sim \\text{Uniform}\\{1, 2, 3, 4, 5, 6\\}$, represent the number on the $i$-th roll, $i = 1, 2$. Calculate $f_{X_1,X_2}(3, 2)$.", 
+          "type": "radio", 
+          "options": ["$\\frac{1}{6}$", "$\\frac{1}{12}$", "$\\frac{1}{36}$", "$\\frac{1}{18}$"], 
+          "answer": 2,
+          "solution": "Since the rolls are independent, the joint probability is the product of the marginals: $\\frac{1}{6} \\times \\frac{1}{6} = \\frac{1}{36}$",
+          "points": 1
+        },
+        { 
+          "id": "q2", 
+          "text": "2) The joint probability mass function of two discrete random variables $X$ and $Y$ is given. Which of the following are possible values of $a$ and $b$?", 
+          "type": "checkbox", 
+          "options": ["$a = \\frac{1}{2}, b = 0$", "$a = \\frac{1}{4}, b = \\frac{1}{2}$", "$a = 1, b = 1$", "$a = \\frac{1}{8}, b = \\frac{3}{8}$"], 
+          "answer": [0],
+          "solution": "The sum of all probabilities must be equal to 1.",
+          "points": 1
+        }
+      ],
+      "modules": [
+        {
+          "id": "m1", 
+          "title": "Week 1: Joint Distributions", 
+          "items": [
+            { 
+              "id": "i1", 
+              "type": "video", 
+              "title": "L1.1: Joint PMF of two discrete random variables", 
+              "url": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+              "notes": "### Important Concepts\n\nThe Joint PMF $P(X=x, Y=y)$ must satisfy the following conditions:\n1. $0 \\le P(x,y) \\le 1$\n2. $\\sum_x \\sum_y P(x,y) = 1$\n\n> Note: Watch the video carefully to understand how to build the joint distribution table.\n\nHere is an inline code example: `P(X=1, Y=2) = 0.25`."
+            },
+            { 
+              "id": "i2", 
+              "type": "note", 
+              "title": "Reading: Marginal PMFs",
+              "content": "## Finding the Marginal Distribution\n\nTo find the marginal PMF of $X$, you must sum over all possible values of $Y$:\n\n$$P_X(x) = \\sum_y P_{XY}(x,y)$$\n\n* Make sure you fully understand this before proceeding to continuous variables!"
+            },
+            { 
+              "id": "i3", 
+              "type": "activity", 
+              "title": "AQ1.1: Activity Question 1 - Not Graded",
+              "description": "**This assignment will not be graded and is only for practice.**\n\nUse the Whiteboard tool below to solve the problems manually.",
+              "questionIds": ["q1", "q2"]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "whiteboardData": {}
+}
