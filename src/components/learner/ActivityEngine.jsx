@@ -22,7 +22,8 @@ export default function ActivityEngine({ item, course }) {
   const { activityProgress, setActivityProgress, updateWhiteboardData } = useStore();
   
   // Convert old scrolling view logic to paginated Mock Exam logic
-  const questions = item.questionIds?.map(id => course.questions?.find(q => q.id === id)).filter(Boolean) || [];
+  // Support both embedded questions and legacy global question lookups
+  const questions = item.questions || item.questionIds?.map(id => course.questions?.find(q => q.id === id)).filter(Boolean) || [];
   const [currentQIndex, setCurrentQIndex] = useState(0);
 
   // New states for the activity (like marked for review, tracking visits)
@@ -96,7 +97,9 @@ export default function ActivityEngine({ item, course }) {
              <div className="bg-slate-50 border-b border-slate-200 px-6 py-4 flex justify-between items-center shrink-0">
                <span className="font-extrabold text-lg text-slate-800">Question {currentQIndex + 1}</span>
                <div className="flex items-center space-x-3 text-sm">
-                   <span className="text-slate-500 font-bold uppercase tracking-widest text-xs bg-slate-200/50 px-2 py-1 rounded">Mock Exam Format</span>
+                   <span className="text-slate-500 font-bold uppercase tracking-widest text-xs bg-slate-200/50 px-2 py-1 rounded">
+                     {item.examType || (item.type === 'assignment' ? 'Graded Assignment' : 'Mock Exam Format')}
+                   </span>
                </div>
              </div>
 
@@ -114,7 +117,7 @@ export default function ActivityEngine({ item, course }) {
 
                 {/* The text/options sit beneath it. If wbTool=pointer, clicks pass-through */}
                 <h3 className="text-lg md:text-xl text-slate-900 font-semibold mb-8 leading-relaxed selection:bg-red-100 relative z-0">
-                   <LatexRenderer text={question.text} />
+                   <LatexRenderer text={question.description || question.text} />
                 </h3>
                 
                 <div className="space-y-4 max-w-3xl relative z-0">

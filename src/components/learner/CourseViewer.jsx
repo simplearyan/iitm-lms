@@ -28,9 +28,11 @@ export default function CourseViewer() {
   };
 
   const getIcon = (type) => {
-    if (type === 'video') return <PlayCircle className="w-4 h-4" />;
-    if (type === 'note') return <FileText className="w-4 h-4" />;
-    if (type === 'activity') return <CheckCircle2 className="w-4 h-4" />;
+    if (type === 'video') return <PlayCircle className="w-4 h-4 text-indigo-500" />;
+    if (type === 'note') return <FileText className="w-4 h-4 text-emerald-500" />;
+    if (type === 'activity') return <CheckCircle2 className="w-4 h-4 text-orange-500" />;
+    if (type === 'assignment') return <CheckCircle2 className="w-4 h-4 text-pink-500" />;
+    if (type === 'quiz') return <CheckCircle2 className="w-4 h-4 text-purple-500" />;
     return <FileText className="w-4 h-4" />;
   };
 
@@ -117,7 +119,9 @@ export default function CourseViewer() {
             <div className={`w-full ${(activeItem.type === 'activity' || activeItem.type === 'video') ? 'flex-1 overflow-hidden flex flex-col' : 'min-h-full pb-20'}`}>
               {activeItem.type === 'video' && <VideoViewer item={activeItem} currentModule={currentModule} />}
               {activeItem.type === 'note' && <NoteViewer item={activeItem} currentModule={currentModule} />}
-              {activeItem.type === 'activity' && <ActivityEngine item={activeItem} course={course} />}
+              {(activeItem.type === 'activity' || activeItem.type === 'assignment' || activeItem.type === 'quiz') && (
+                <ActivityEngine item={activeItem} course={course} />
+              )}
             </div>
 
           </div>

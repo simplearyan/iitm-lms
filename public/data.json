@@ -60,8 +60,111 @@
               "id": "i3", 
               "type": "activity", 
               "title": "AQ1.1: Activity Question 1 - Not Graded",
-              "description": "**This assignment will not be graded and is only for practice.**\n\nUse the Whiteboard tool below to solve the problems manually.",
-              "questionIds": ["q1", "q2"]
+              "questions": [
+                {
+                  "id": "aq1_q1",
+                  "description": "If $X$ and $Y$ are independent random variables, what is $E[XY]$?",
+                  "options": ["$E[X] + E[Y]$ text-slate-800", "$E[X]E[Y]$ text-slate-800", "$E[X]/E[Y]$ text-slate-800", "$0$ text-slate-800"],
+                  "answer": 1,
+                  "solution": "By independence, the expectation of the product is the product of the expectations."
+                }
+              ]
+            },
+            {
+              "id": "i4",
+              "type": "quiz",
+              "title": "Mock Practice: Discrete Probability Spaces",
+              "examType": "Mock Practice",
+              "duration": 15,
+              "totalMarks": 15,
+              "submissionRule": "anytime",
+              "questions": [
+                {
+                  "id": "mp_q1",
+                  "description": "Suppose $X \\sim \\text{Poisson}(\\lambda)$. What is $P(X=0)$?",
+                  "options": ["$e^{-\\lambda}$", "$\\lambda e^{-\\lambda}$", "$1 - e^{-\\lambda}$", "$0$"],
+                  "answer": 0,
+                  "solution": "The Poisson PMF is $P(X=k) = \\frac{\\lambda^k e^{-\\lambda}}{k!}$. For $k=0$, $P(X=0) = \\frac{\\lambda^0 e^{-\\lambda}}{0!} = e^{-\\lambda}$."
+                },
+                {
+                  "id": "py_q1",
+                  "description": "Which of the following is an immutable data type in Python?",
+                  "options": ["List", "Dictionary", "Set", "Tuple"],
+                  "answer": 3,
+                  "solution": "In Python, Tuples are immutable, meaning their elements cannot be changed after they are created. Lists, Dictionaries, and Sets are mutable."
+                },
+                {
+                  "id": "py_q2",
+                  "description": "What is the output of `print(2 ** 3 ** 2)`?",
+                  "options": ["64", "512", "4096", "None of the above"],
+                  "answer": 1,
+                  "solution": "Exponentiation `**` is evaluated from right to left in Python. So, `2 ** 3 ** 2` is evaluated as `2 ** (3 ** 2)` -> `2 ** 9` -> `512`."
+                }
+              ]
+            },
+            {
+              "id": "i5",
+              "type": "quiz",
+              "title": "Quiz 1: Joint & Marginal Distributions",
+              "examType": "Quiz",
+              "duration": 30,
+              "totalMarks": 20,
+              "submissionRule": "auto_only",
+              "questions": [
+                {
+                  "id": "qz1_q1",
+                  "description": "Consider the joint PMF $f(x,y)=k(x+y)$ for $x,y \\in \\{1,2\\}$. Find the value of $k$.",
+                  "options": ["$1/12$", "$1/15$", "$1/18$", "$1/20$"],
+                  "answer": 0,
+                  "solution": "Summing probabilities: $k(1+1) + k(1+2) + k(2+1) + k(2+2) = k(2+3+3+4) = 12k = 1 \\Rightarrow k = 1/12$."
+                },
+                {
+                  "id": "ma_q1",
+                  "description": "What is the derivative of $f(x) = e^x$?",
+                  "options": ["$x \\cdot e^{x-1}$", "$e^x$", "$\\ln(x)$", "$\\frac{1}{x}$"],
+                  "answer": 1,
+                  "solution": "The exponential function $e^x$ is unique because its derivative is exactly itself. Therefore, $\\frac{d}{dx} e^x = e^x$."
+                }
+              ]
+            },
+            {
+              "id": "i6",
+              "type": "quiz",
+              "title": "Midterm Exam 2026: Statistics II",
+              "examType": "Term Exam",
+              "duration": 120,
+              "totalMarks": 100,
+              "submissionRule": "last_10_mins",
+              "questions": [
+                {
+                  "id": "mt_q1",
+                  "description": "Evaluate the limit: $$\\lim_{x \\to 0} \\frac{\\sin(x)}{x}$$",
+                  "options": ["$0$", "$1$", "$\\infty$", "Undefined"],
+                  "answer": 1,
+                  "solution": "This is a fundamental trigonometric limit. As $x$ approaches $0$, the value of $\\frac{\\sin(x)}{x}$ approaches $1$."
+                },
+                {
+                  "id": "ct_q1",
+                  "description": "Which of these is NOT a pillar of computational thinking?",
+                  "options": ["Decomposition", "Pattern Recognition", "Memorization", "Abstraction"],
+                  "answer": 2,
+                  "solution": "The 4 pillars of computational thinking are Decomposition, Pattern Recognition, Abstraction, and Algorithmic Thinking. Memorization is not one of them."
+                }
+              ]
+            },
+            {
+              "id": "i7",
+              "type": "assignment",
+              "title": "Graded Assignment 1.1: Expectations",
+              "questions": [
+                {
+                  "id": "ga_q1",
+                  "description": "Calculate $E[X^2]$ if $X \\sim \\text{Bernoulli}(p)$.",
+                  "options": ["$p^2$", "$p$", "$1-p$", "$2p$"],
+                  "answer": 1,
+                  "solution": "$E[X^2] = 1^2 \\cdot p + 0^2 \\cdot (1-p) = p$. Note that for Bernoulli, $E[X^k] = p$ for all $k \\ge 1$."
+                }
+              ]
             }
           ]
         }

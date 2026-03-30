@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import useStore from '../../store/useStore';
 import { useParams, Link } from 'react-router-dom';
-import { ChevronLeft, Plus, GripVertical, Video, FileText, CheckCircle2, Navigation, Trash2, Settings, Download, X, Edit3, Save } from 'lucide-react';
+import { ChevronLeft, Plus, GripVertical, Video, FileText, CheckCircle2, Navigation, Trash2, Settings, Download, X, Edit3, Save, ClipboardList, Clock } from 'lucide-react';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import katex from 'katex';
@@ -106,7 +106,6 @@ export default function SyllabusBuilder() {
     const moduleIndex = course.modules.findIndex(m => m.id === activeModuleId);
     if (moduleIndex === -1) return;
     
-    // Create new blank item template
     const newItem = {
       id: `i_${Date.now()}`,
       type,
@@ -117,6 +116,28 @@ export default function SyllabusBuilder() {
           questions: [{
               id: `q_${Date.now()}`,
               description: 'What is $x^2$?', 
+              options: ['Option A', 'Option B', 'Option C', 'Option D'], 
+              answer: 0, 
+              solution: 'Explanation goes here.'
+          }]
+      } : {}),
+      ...(type === 'assignment' ? { 
+          questions: [{
+              id: `q_${Date.now()}`,
+              description: 'Graded Assignment: What is $y^2$?', 
+              options: ['Option A', 'Option B', 'Option C', 'Option D'], 
+              answer: 0, 
+              solution: 'Explanation goes here.'
+          }]
+      } : {}),
+      ...(type === 'quiz' ? { 
+          examType: 'Mock Practice',
+          duration: 30,
+          totalMarks: 10,
+          submissionRule: 'anytime',
+          questions: [{
+              id: `q_${Date.now()}`,
+              description: 'Mock Quiz Question 1', 
               options: ['Option A', 'Option B', 'Option C', 'Option D'], 
               answer: 0, 
               solution: 'Explanation goes here.'
@@ -217,10 +238,12 @@ export default function SyllabusBuilder() {
                      />
                  </div>
                  <div className="flex gap-3 bg-slate-50 p-2 rounded-2xl border border-slate-200 w-full md:w-auto shrink-0 justify-between md:justify-start overflow-x-auto">
-                   <button onClick={() => handleAddItem('video')} className="px-4 py-2 bg-white flex items-center gap-2 text-sm font-bold text-blue-600 hover:bg-blue-50 hover:text-blue-700 border border-slate-200 rounded-xl shrink-0 transition-all shadow-sm hover:shadow-md" title="Add Video"><Video className="w-4 h-4"/> Video</button>
-                   <button onClick={() => handleAddItem('note')} className="px-4 py-2 bg-white flex items-center gap-2 text-sm font-bold text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700 border border-slate-200 rounded-xl shrink-0 transition-all shadow-sm hover:shadow-md" title="Add Note"><FileText className="w-4 h-4"/> Note</button>
-                   <button onClick={() => handleAddItem('activity')} className="px-4 py-2 bg-white flex items-center gap-2 text-sm font-bold text-orange-600 hover:bg-orange-50 hover:text-orange-700 border border-slate-200 rounded-xl shrink-0 transition-all shadow-sm hover:shadow-md" title="Add Activity"><CheckCircle2 className="w-4 h-4"/> Activity</button>
-                 </div>
+                    <button onClick={() => handleAddItem('video')} className="px-4 py-2 bg-white flex items-center gap-2 text-sm font-bold text-blue-600 hover:bg-blue-50 hover:text-blue-700 border border-slate-200 rounded-xl shrink-0 transition-all shadow-sm hover:shadow-md" title="Add Video"><Video className="w-4 h-4"/> Video</button>
+                    <button onClick={() => handleAddItem('note')} className="px-4 py-2 bg-white flex items-center gap-2 text-sm font-bold text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700 border border-slate-200 rounded-xl shrink-0 transition-all shadow-sm hover:shadow-md" title="Add Note"><FileText className="w-4 h-4"/> Note</button>
+                    <button onClick={() => handleAddItem('activity')} className="px-4 py-2 bg-white flex items-center gap-2 text-sm font-bold text-orange-600 hover:bg-orange-50 hover:text-orange-700 border border-slate-200 rounded-xl shrink-0 transition-all shadow-sm hover:shadow-md" title="Add Activity"><CheckCircle2 className="w-4 h-4"/> Activity</button>
+                    <button onClick={() => handleAddItem('assignment')} className="px-4 py-2 bg-white flex items-center gap-2 text-sm font-bold text-pink-600 hover:bg-pink-50 hover:text-pink-700 border border-slate-200 rounded-xl shrink-0 transition-all shadow-sm hover:shadow-md" title="Add Assignment"><ClipboardList className="w-4 h-4"/> Assignment</button>
+                    <button onClick={() => handleAddItem('quiz')} className="px-4 py-2 bg-white flex items-center gap-2 text-sm font-bold text-purple-600 hover:bg-purple-50 hover:text-purple-700 border border-slate-200 rounded-xl shrink-0 transition-all shadow-sm hover:shadow-md" title="Add Quiz"><Clock className="w-4 h-4"/> Quiz</button>
+                  </div>
                </div>
 
                <div className="space-y-4">
@@ -229,9 +252,18 @@ export default function SyllabusBuilder() {
                      <div className="cursor-grab text-slate-300 hover:text-slate-500 p-2">
                        <GripVertical className="w-5 h-5" />
                      </div>
-                     <div className={`p-3 rounded-xl shrink-0 ${item.type === 'video' ? 'bg-blue-100 text-blue-600' : (item.type === 'note' ? 'bg-emerald-100 text-emerald-600' : 'bg-orange-100 text-orange-600')}`}>
-                       {item.type === 'video' ? <Video className="w-5 h-5"/> : (item.type === 'note' ? <FileText className="w-5 h-5"/> : <CheckCircle2 className="w-5 h-5"/>)}
-                     </div>
+                     <div className={`p-3 rounded-xl shrink-0 ${
+                          item.type === 'video' ? 'bg-blue-100 text-blue-600' : 
+                          (item.type === 'note' ? 'bg-emerald-100 text-emerald-600' : 
+                          (item.type === 'activity' ? 'bg-orange-100 text-orange-600' : 
+                          (item.type === 'assignment' ? 'bg-pink-100 text-pink-600' : 'bg-purple-100 text-purple-600')))}`}>
+                        {
+                            item.type === 'video' ? <Video className="w-5 h-5"/> : 
+                            (item.type === 'note' ? <FileText className="w-5 h-5"/> : 
+                            (item.type === 'activity' ? <CheckCircle2 className="w-5 h-5"/> : 
+                            (item.type === 'assignment' ? <ClipboardList className="w-5 h-5"/> : <Clock className="w-5 h-5"/>)))
+                        }
+                      </div>
                      <input 
                        className="flex-1 font-bold text-slate-800 text-lg focus:outline-none focus:ring-4 focus:ring-orange-500/10 px-4 py-2 rounded-xl border border-transparent hover:border-slate-200 hover:bg-slate-50 transition-all"
                        defaultValue={item.title}
@@ -344,7 +376,7 @@ export default function SyllabusBuilder() {
                     </div>
                   )}
 
-                  {editingItem.type === 'activity' && (() => {
+                  {['activity', 'assignment', 'quiz'].includes(editingItem.type) && (() => {
                     const safeQuestions = editingItem.questions || [{
                          id: editingItem.id + "_tmp",
                          description: editingItem.description || '',
@@ -378,6 +410,54 @@ export default function SyllabusBuilder() {
 
                     return (
                     <div className="space-y-8">
+                       {editingItem.type === 'quiz' && (
+                        <div className="bg-purple-50 p-6 rounded-2xl border border-purple-100 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10 shadow-sm relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-3 opacity-10"><Clock className="w-20 h-20 text-purple-900" /></div>
+                            <div>
+                              <label className="block text-xs font-bold text-purple-700 uppercase tracking-widest mb-2 flex items-center gap-2">Assessment Type</label>
+                              <select 
+                                className="w-full p-2.5 bg-white border border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 font-bold text-slate-800 transition-all"
+                                value={editingItem.examType || 'Mock Practice'}
+                                onChange={(e) => updateEditingItem('examType', e.target.value)}
+                              >
+                                <option>Mock Practice</option>
+                                <option>Quiz</option>
+                                <option>Term Exam</option>
+                                <option>Graded Assignment</option>
+                              </select>
+                            </div>
+                            <div>
+                              <label className="block text-xs font-bold text-purple-700 uppercase tracking-widest mb-2 flex items-center gap-2">Duration (Minutes)</label>
+                              <input 
+                                type="number"
+                                className="w-full p-2.5 bg-white border border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 font-bold text-slate-800 transition-all"
+                                value={editingItem.duration || 30}
+                                onChange={(e) => updateEditingItem('duration', parseInt(e.target.value))}
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-bold text-purple-700 uppercase tracking-widest mb-2 flex items-center gap-2">Total Marks</label>
+                              <input 
+                                type="number"
+                                className="w-full p-2.5 bg-white border border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 font-bold text-slate-800 transition-all"
+                                value={editingItem.totalMarks || 10}
+                                onChange={(e) => updateEditingItem('totalMarks', parseInt(e.target.value))}
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-bold text-purple-700 uppercase tracking-widest mb-2 flex items-center gap-2">Submission Policy</label>
+                              <select 
+                                className="w-full p-2.5 bg-white border border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 font-bold text-slate-800 transition-all"
+                                value={editingItem.submissionRule || 'anytime'}
+                                onChange={(e) => updateEditingItem('submissionRule', e.target.value)}
+                              >
+                                <option value="anytime">Open (Can submit anytime)</option>
+                                <option value="last_10_mins">Restricted (Last 10 mins)</option>
+                                <option value="auto_only">Strict (Auto-submit at 0:00)</option>
+                              </select>
+                            </div>
+                        </div>
+                      )}
                       {safeQuestions.map((q, qIndex) => (
                         <div key={q.id} className="p-5 md:p-6 bg-slate-50 border border-slate-200 rounded-xl relative overflow-hidden group">
                            {safeQuestions.length > 1 && (
@@ -385,7 +465,7 @@ export default function SyllabusBuilder() {
                            )}
                            <h4 className="font-black text-slate-800 mb-5 flex items-center text-lg">
                               <span className="bg-indigo-600 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm mr-3 shadow-sm">{qIndex + 1}</span> 
-                              Question Builder
+                              {editingItem.type === 'quiz' ? 'Exam Question Builder' : (editingItem.type === 'assignment' ? 'Assignment Task Builder' : 'Activity Builder')}
                            </h4>
                            
                            {/* Question Description */}
