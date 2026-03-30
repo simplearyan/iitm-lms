@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import useStore from '../../store/useStore';
 import { useParams, Link } from 'react-router-dom';
-import { ChevronLeft, Plus, GripVertical, Video, FileText, CheckCircle2, Navigation, Trash2, Settings, Download, X } from 'lucide-react';
+import { ChevronLeft, Plus, GripVertical, Video, FileText, CheckCircle2, Navigation, Trash2, Settings, Download, X, Edit3, Save } from 'lucide-react';
 
 export default function SyllabusBuilder() {
   const { courseId } = useParams();
@@ -53,7 +53,12 @@ export default function SyllabusBuilder() {
       title: `New ${type} item...`,
       ...(type === 'video' ? { url: '', notes: '' } : {}),
       ...(type === 'note' ? { content: '# Start writing...' } : {}),
-      ...(type === 'activity' ? { description: 'Activity instructions', questionIds: [] } : {})
+      ...(type === 'activity' ? { 
+          description: 'What is $x^2$?', 
+          options: ['Option A', 'Option B', 'Option C', 'Option D'], 
+          answer: 0, 
+          solution: 'Explanation goes here.' 
+      } : {})
     };
     
     updatedCourses[courseIndex].modules[moduleIndex].items.push(newItem);
@@ -206,21 +211,22 @@ export default function SyllabusBuilder() {
        {editingItemId && activeModule?.items?.find(i => i.id === editingItemId) && (() => {
          const editingItem = activeModule.items.find(i => i.id === editingItemId);
          return (
-         <div className="fixed inset-0 z-[100] flex justify-end">
-            <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm animate-in fade-in" onClick={() => setEditingItemId(null)}></div>
-            <div className="w-full max-w-lg bg-white h-full shadow-2xl relative flex flex-col animate-in slide-in-from-right duration-300">
-               <div className="flex justify-between items-center p-6 border-b border-slate-100">
-                  <h3 className="font-black text-xl text-slate-800 flex items-center gap-2">
-                     <Settings className="w-5 h-5 text-indigo-600"/> Edit Content
+         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+            <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in" onClick={() => setEditingItemId(null)}></div>
+            <div className="w-full max-w-4xl bg-white shadow-2xl relative flex flex-col max-h-[90vh] overflow-hidden animate-in fade-in zoom-in-95 rounded-xl border border-gray-200">
+               
+               <div className="bg-slate-900 text-white px-6 py-4 flex justify-between items-center shrink-0">
+                  <h3 className="font-bold text-lg flex items-center gap-2">
+                     <Edit3 className="w-5 h-5 text-blue-400"/> Content Editor
                   </h3>
-                  <button onClick={() => setEditingItemId(null)} className="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-50 transition-colors"><X className="w-6 h-6"/></button>
+                  <button onClick={() => setEditingItemId(null)} className="text-gray-300 hover:text-white transition-colors "><X className="w-6 h-6"/></button>
                </div>
                
-               <div className="flex-1 overflow-y-auto p-6 md:p-8 flex flex-col gap-6 custom-scrollbar">
+               <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6 custom-scrollbar bg-white">
                   <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-2">Item Title</label>
+                    <label className="block text-sm font-bold text-gray-800 mb-2">Item Title</label>
                     <input 
-                      className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                      className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium text-gray-900"
                       value={editingItem.title || ''}
                       onChange={(e) => updateEditingItem('title', e.target.value)}
                     />
@@ -229,18 +235,18 @@ export default function SyllabusBuilder() {
                   {editingItem.type === 'video' && (
                     <>
                       <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-2">YouTube Video URL</label>
+                        <label className="block text-sm font-bold text-gray-800 mb-2">YouTube Video URL</label>
                         <input 
-                          className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                          className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium text-gray-900"
                           placeholder="https://youtube.com/embed/..."
                           value={editingItem.url || ''}
                           onChange={(e) => updateEditingItem('url', e.target.value)}
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-2">Video Synopsis (Markdown)</label>
+                        <label className="block text-sm font-bold text-gray-800 mb-2">Video Synopsis (Markdown)</label>
                         <textarea 
-                          className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-medium h-64 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 resize-none font-mono text-sm leading-relaxed"
+                          className="w-full p-3 border border-gray-300 rounded h-64 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none font-mono text-sm leading-relaxed text-gray-800"
                           value={editingItem.notes || ''}
                           onChange={(e) => updateEditingItem('notes', e.target.value)}
                           placeholder="Write video synopsis here..."
@@ -251,12 +257,12 @@ export default function SyllabusBuilder() {
 
                   {editingItem.type === 'note' && (
                     <div className="flex-1 flex flex-col min-h-[300px]">
-                        <label className="block text-sm font-bold text-slate-700 mb-2 flex justify-between items-center">
+                        <label className="block text-sm font-bold text-gray-800 mb-2 flex justify-between items-center">
                            Document Body 
                            <span className="text-[10px] bg-slate-200 text-slate-600 px-2 py-1 rounded font-mono">MD + LaTeX</span>
                         </label>
                         <textarea 
-                          className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-medium flex-1 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 resize-y font-mono text-sm leading-relaxed min-h-[300px]"
+                          className="w-full p-3 border border-gray-300 rounded flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-y font-mono text-sm leading-relaxed min-h-[300px] text-gray-800"
                           value={editingItem.content || ''}
                           onChange={(e) => updateEditingItem('content', e.target.value)}
                           placeholder="# Welcome to Notes\n\nWrite your equations with $$..."
@@ -265,24 +271,62 @@ export default function SyllabusBuilder() {
                   )}
 
                   {editingItem.type === 'activity' && (
-                    <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-2">Activity Description</label>
-                        <textarea 
-                          className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-medium h-32 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 resize-none font-mono text-sm"
-                          value={editingItem.description || ''}
-                          onChange={(e) => updateEditingItem('description', e.target.value)}
-                        />
-                        <div className="mt-4 p-4 bg-orange-50 rounded-xl border border-orange-100">
-                           <p className="text-sm font-bold text-orange-800 mb-1 flex items-center gap-2"><Settings className="w-4 h-4"/> Advanced Binding</p>
-                           <p className="text-xs text-orange-600 font-medium">Activity node bindings (question IDs, interactive seeds) currently natively map through JSON IDs. Manage IDs directly in Export state.</p>
-                        </div>
+                    <div className="space-y-6">
+                      <div>
+                          <label className="block text-sm font-bold text-gray-800 mb-2">Question Text (Supports KaTeX via $ or $$)</label>
+                          <textarea rows="3" value={editingItem.description || ''} onChange={e => updateEditingItem('description', e.target.value)} className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm text-gray-800" placeholder="E.g., What is $x^2$?" />
+                          <div className="mt-2 p-3 bg-gray-50 border border-gray-200 rounded text-sm text-gray-800 shadow-inner block">
+                              <strong className="text-xs text-gray-400 uppercase tracking-widest block mb-1">Live Source Form</strong>
+                              <span className="font-mono text-xs">{editingItem.description || "Type above to preview..."}</span>
+                          </div>
+                      </div>
+
+                      {/* Options */}
+                      <div>
+                          <label className="block text-sm font-bold text-gray-800 mb-3">Options & Correct Answer</label>
+                          <div className="space-y-3">
+                              {(editingItem.options || ['Option A', 'Option B', 'Option C', 'Option D']).map((opt, idx) => (
+                                  <div key={idx} className="flex items-start space-x-3 bg-gray-50 p-3 rounded border border-gray-200">
+                                      <input 
+                                          type="radio" 
+                                          name={`correct_answer_${editingItem.id}`} 
+                                          checked={editingItem.answer === idx}
+                                          onChange={() => updateEditingItem('answer', idx)}
+                                          className="mt-3 w-5 h-5 accent-blue-600 cursor-pointer"
+                                      />
+                                      <div className="flex-1">
+                                          <input 
+                                              type="text" 
+                                              value={opt} 
+                                              onChange={e => {
+                                                  let newOpts = [...(editingItem.options || ['','','',''])];
+                                                  newOpts[idx] = e.target.value;
+                                                  updateEditingItem('options', newOpts);
+                                              }} 
+                                              className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm mb-2 text-gray-800" 
+                                              placeholder={`Option ${String.fromCharCode(65+idx)}`}
+                                          />
+                                      </div>
+                                  </div>
+                              ))}
+                          </div>
+                      </div>
+
+                      {/* Solution / Explanation */}
+                      <div>
+                          <label className="block text-sm font-bold text-gray-800 mb-2">Solution / Explanation</label>
+                          <textarea rows="3" value={editingItem.solution || ""} onChange={e => updateEditingItem('solution', e.target.value)} className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm text-gray-800" placeholder="Explain the correct answer..." />
+                      </div>
                     </div>
                   )}
                </div>
                
-               <div className="p-6 border-t border-slate-100 bg-white shrink-0">
-                  <button onClick={() => setEditingItemId(null)} className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5">
-                     Done Editing
+               <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 shrink-0 flex justify-end gap-3">
+                  <button onClick={() => setEditingItemId(null)} className="px-5 py-2 hover:bg-gray-200 text-gray-700 font-bold rounded transition-colors border border-gray-300 bg-white shadow-sm">
+                     Close
+                  </button>
+                  <button onClick={() => setEditingItemId(null)} className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded transition-all shadow-sm flex items-center gap-2">
+                     <Save className="w-4 h-4"/> Save Content
                   </button>
                </div>
             </div>
