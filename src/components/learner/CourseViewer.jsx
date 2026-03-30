@@ -98,11 +98,11 @@ export default function CourseViewer() {
             Select a learning item to begin.
           </div>
         ) : (
-          <div className={`flex-1 relative flex flex-col ${(activeItem.type === 'activity' || activeItem.type === 'video') ? 'bg-slate-50' : 'overflow-y-auto p-6 md:p-10 lg:p-14'}`}>
+          <div className={`flex-1 relative flex flex-col bg-slate-50 ${(activeItem.type === 'activity' || activeItem.type === 'video') ? 'overflow-hidden' : 'overflow-y-auto'}`}>
             
-            {/* Context Header (Hidden in activity/video mode to maximize vertical screen space and use custom headers) */}
-            {activeItem.type !== 'activity' && activeItem.type !== 'video' && (
-              <div className={`mb-8 border-b pb-6 ${activeItem.type === 'note' ? 'border-transparent' : 'border-slate-100'}`}>
+            {/* Context Header (Hidden for all built-in types to maximize vertical screen space and use custom component headers) */}
+            {activeItem.type !== 'activity' && activeItem.type !== 'video' && activeItem.type !== 'note' && (
+              <div className={`m-14 mb-8 border-b pb-6 ${activeItem.type === 'note' ? 'border-transparent' : 'border-slate-100'}`}>
                  <div className="text-xs font-bold tracking-widest text-slate-400 uppercase mb-3 flex items-center gap-2">
                    <span>{currentModule?.title}</span>
                    <span className="w-1 h-1 rounded-full bg-slate-300"></span>
@@ -114,9 +114,9 @@ export default function CourseViewer() {
             )}
 
             {/* Content Switcher */}
-            <div className={`w-full ${(activeItem.type === 'activity' || activeItem.type === 'video') ? 'flex-1 overflow-hidden flex flex-col' : 'max-w-4xl mx-auto pb-20'}`}>
+            <div className={`w-full ${(activeItem.type === 'activity' || activeItem.type === 'video') ? 'flex-1 overflow-hidden flex flex-col' : 'min-h-full pb-20'}`}>
               {activeItem.type === 'video' && <VideoViewer item={activeItem} currentModule={currentModule} />}
-              {activeItem.type === 'note' && <NoteViewer item={activeItem} />}
+              {activeItem.type === 'note' && <NoteViewer item={activeItem} currentModule={currentModule} />}
               {activeItem.type === 'activity' && <ActivityEngine item={activeItem} course={course} />}
             </div>
 

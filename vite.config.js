@@ -9,3 +9,5 @@ export default defineConfig({
     tailwindcss(),
   ],
 })
+
+// Triggering Vite reboot for tailwind typography plugin
