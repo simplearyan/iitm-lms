@@ -20,28 +20,53 @@ export default function WhiteboardOverlay({
   
   const { whiteboardData, updateWhiteboardData } = useStore();
   let elements = whiteboardData[questionId] || [];
+  
+  // Use a ref to hold latest elements to avoid tearing down the ResizeObserver on every brush stroke
+  const elementsRef = useRef(elements);
+  elementsRef.current = elements;
 
   useEffect(() => {
     if (!canvasRef.current) return;
     const canvas = canvasRef.current;
     
     const resize = () => {
-      // In inline mode, fill the parent container relative block.
-      // In fixed mode, fill window.
       const parent = canvas.parentElement;
-      canvas.width = isInline ? parent.clientWidth : window.innerWidth;
-      canvas.height = isInline ? parent.clientHeight : window.innerHeight;
+      if (!parent) return;
+      
+      const newWidth = isInline ? parent.clientWidth : window.innerWidth;
+      const newHeight = isInline ? parent.clientHeight : window.innerHeight;
+      
+      // ONLY mutate canvas size if it actually changed to prevent unintentional frame clears
+      if (canvas.width !== newWidth || canvas.height !== newHeight) {
+          canvas.width = newWidth;
+          canvas.height = newHeight;
+      }
       requestAnimationFrame(redraw);
     };
     
-    // Initial and window resize
-    window.addEventListener('resize', resize);
+    // Initial resize trigger
+    setTimeout(resize, 50);
+
+    let resizeObserver;
+    if (isInline && canvas.parentElement) {
+       // Watch for Document Height Changes (e.g., KaTeX rendering, images loading)
+       resizeObserver = new ResizeObserver(() => resize());
+       resizeObserver.observe(canvas.parentElement);
+    } else {
+       // Watch for purely window-based shifts in overlay mode
+       window.addEventListener('resize', resize);
+    }
     
-    // Small delay to ensure parent handles layout shifts before drawing
-    setTimeout(resize, 50); 
-    
-    return () => window.removeEventListener('resize', resize);
-  }, [elements, isInline]); // Re-evaluate if inline switches
+    return () => {
+       if (resizeObserver) resizeObserver.disconnect();
+       window.removeEventListener('resize', resize);
+    };
+  }, [isInline]); // Removed elements dependency!
+
+  // Redraw hook if elements update remotely
+  useEffect(() => {
+     requestAnimationFrame(redraw);
+  }, [elements]);
 
   const redraw = () => {
     if (!canvasRef.current) return;
@@ -63,13 +88,14 @@ export default function WhiteboardOverlay({
 
     const rc = rough.canvas(canvas);
     
-    elements.forEach(el => {
+    elementsRef.current.forEach(el => {
+      const isPen = el.type === 'pen';
       const options = { 
           stroke: el.stroke, 
           strokeWidth: el.strokeWidth, 
-          roughness: 1.5,
+          roughness: isPen ? 0 : 1.5,
           seed: el.seed || 1,
-          bowing: 1
+          bowing: isPen ? 0 : 1
       };
       
       if (el.type === 'pen' && el.points.length > 0) {

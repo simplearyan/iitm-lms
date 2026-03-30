@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FileText, PlayCircle } from 'lucide-react';
 import { marked } from 'marked';
 import katex from 'katex';
+import WhiteboardOverlay from '../shared/WhiteboardOverlay';
+import FloatingAnnotationToolbar from '../shared/FloatingAnnotationToolbar';
+import useStore from '../../store/useStore';
 
 // Pre-configure marked to not parse HTML if not needed, or just defaults
 marked.setOptions({
@@ -28,6 +31,11 @@ const renderFormattedNotes = (markdownText) => {
 };
 
 export default function VideoViewer({ item, currentModule }) {
+  const [isAnnotationMode, setIsAnnotationMode] = useState(false);
+  const [currentTool, setCurrentTool] = useState('pen');
+  const [currentColor, setCurrentColor] = useState('#2563eb'); // Classic blue pen
+  const { updateWhiteboardData } = useStore();
+
   return (
     <div className="w-full h-full flex flex-col lg:flex-row animate-fade-in relative bg-slate-50">
       
@@ -46,11 +54,26 @@ export default function VideoViewer({ item, currentModule }) {
         
         {/* Video Area (Theater Mode) - Brightened and Expanded */}
         <div className="flex-1 bg-white flex items-center justify-center p-0 lg:p-10 overflow-y-auto">
-             <div className="w-full max-w-[1200px] mx-auto aspect-video bg-black lg:rounded-2xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.12)] border-0 lg:border border-slate-200 relative transition-all flex-shrink-0">
+              <div className="w-full max-w-[1200px] mx-auto aspect-video bg-black lg:rounded-2xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.12)] border-0 lg:border border-slate-200 relative transition-all flex-shrink-0 group">
                {item.url ? (
                  <iframe className="absolute inset-0 w-full h-full" src={item.url} allowFullScreen title={item.title}></iframe>
                ) : (
                  <div className="text-slate-400 w-full h-full flex items-center justify-center font-mono">Video Error: No Source URL</div>
+               )}
+
+               {/* Video Bound Annotations Frame */}
+               <WhiteboardOverlay 
+                   questionId={`video-${item.id}`} 
+                   isInline={true} 
+                   toolProp={isAnnotationMode ? currentTool : 'pointer'} 
+                   colorProp={currentColor} 
+               />
+               
+               {/* Visual indicator when annotation mode is locked */}
+               {isAnnotationMode && (
+                   <div className="absolute top-4 right-4 bg-indigo-600/90 text-white text-xs font-bold px-3 py-1.5 rounded-full z-30 shadow flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-red-400 animate-pulse"></div> Drawing Mode Active
+                   </div>
                )}
              </div>
         </div>
@@ -64,7 +87,7 @@ export default function VideoViewer({ item, currentModule }) {
                   <h3 className="font-black text-slate-800 tracking-tight text-sm uppercase">Video Synopsis</h3>
               </div>
               
-              <div className="flex-1 overflow-y-auto p-6 md:p-8 md:px-10 custom-scrollbar">
+              <div className="flex-1 overflow-y-auto p-6 md:p-8 md:px-10 custom-scrollbar relative">
                   <div 
                      className="font-sans text-slate-700 prose prose-slate max-w-none text-[1.125rem] leading-[1.75] prose-headings:font-black prose-headings:text-slate-800 prose-headings:tracking-tight prose-a:text-indigo-600 prose-code:font-mono prose-code:text-[#475569] prose-code:bg-[#e2e8f0] prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:text-[0.85em] prose-code:before:content-none prose-code:after:content-none prose-p:mb-[1.25em]"
                      dangerouslySetInnerHTML={renderFormattedNotes(item.notes)}
@@ -72,6 +95,17 @@ export default function VideoViewer({ item, currentModule }) {
               </div>
           </div>
       )}
+
+      {/* Floating Annotation Toolkit */}
+      <FloatingAnnotationToolbar 
+          isAnnotationMode={isAnnotationMode}
+          setIsAnnotationMode={setIsAnnotationMode}
+          currentTool={currentTool}
+          setCurrentTool={setCurrentTool}
+          currentColor={currentColor}
+          setCurrentColor={setCurrentColor}
+          onClear={() => updateWhiteboardData(`video-${item.id}`, [])}
+      />
     </div>
   );
 }

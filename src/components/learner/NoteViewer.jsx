@@ -1,12 +1,21 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { FileText, CalendarDays } from 'lucide-react';
+import hljs from 'highlight.js';
+import 'highlight.js/styles/atom-one-dark-reasonable.css';
+import WhiteboardOverlay from '../shared/WhiteboardOverlay';
+import FloatingAnnotationToolbar from '../shared/FloatingAnnotationToolbar';
+import useStore from '../../store/useStore';
 
 export default function NoteViewer({ item, currentModule }) {
   const contentRef = useRef(null);
+  const [isAnnotationMode, setIsAnnotationMode] = useState(false);
+  const [currentTool, setCurrentTool] = useState('pen');
+  const [currentColor, setCurrentColor] = useState('#dc2626'); // Classic red pen
+  const { updateWhiteboardData } = useStore();
   
   useEffect(() => {
     if (!contentRef.current || !item.content) return;
@@ -14,12 +23,12 @@ export default function NoteViewer({ item, currentModule }) {
     // Step 1: Replace math blocks temporarily to prevent markdown from mutating it
     let text = item.content;
     const mathBlocks = [];
-    text = text.replace(/\$\$([\s\S]+?)\$\$/g, (match, math) => {
-        mathBlocks.push({ type: 'block', math });
+    text = text.replace(/\$\$(!?)([\s\S]+?)\$\$/g, (match, isImportant, math) => {
+        mathBlocks.push({ type: 'block', math, isImportant: !!isImportant });
         return `%%%MATH_${mathBlocks.length - 1}%%%`;
     });
     text = text.replace(/\$([^$\n]+?)\$/g, (match, math) => {
-        mathBlocks.push({ type: 'inline', math });
+        mathBlocks.push({ type: 'inline', math, isImportant: false });
         return `%%%MATH_${mathBlocks.length - 1}%%%`;
     });
 
@@ -30,23 +39,46 @@ export default function NoteViewer({ item, currentModule }) {
     // Step 3: Replace math placeholders with rendered KaTeX
     mathBlocks.forEach((block, index) => {
         try {
-            const rendered = katex.renderToString(block.math, {
+            const mathString = block.math;
+            
+            const rendered = katex.renderToString(mathString, {
                 displayMode: block.type === 'block',
                 throwOnError: false
             });
-            html = html.replace(`%%%MATH_${index}%%%`, rendered);
+            
+            let finalHtml = rendered;
+            
+            // Custom Markdown Extension: Important Formula Callout (Minimal Contrast Style)
+            if (block.isImportant) {
+                finalHtml = `<div class="scale-[1.04] origin-center my-6 text-black drop-shadow-sm">${rendered}</div>`;
+            }
+            
+            html = html.replace(`%%%MATH_${index}%%%`, finalHtml);
         } catch (e) {
             html = html.replace(`%%%MATH_${index}%%%`, block.math);
         }
     });
 
     contentRef.current.innerHTML = html;
+    
+    // Step 4: Apply Syntax Highlighting to parsed code blocks
+    contentRef.current.querySelectorAll('pre code').forEach((block) => {
+        hljs.highlightElement(block);
+    });
   }, [item]);
 
   return (
     <div className="w-full flex justify-center p-4 md:p-8 lg:p-12 min-h-full">
         {/* Floating Paper Document - Scaled down borders for professional vibe */}
         <div className="w-full max-w-[850px] bg-white rounded-md shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-slate-200/60 overflow-hidden animate-fade-in relative flex flex-col">
+            
+            {/* STICKY CANVAS: Implicitly binds directly to the height of the dynamic document */}
+            <WhiteboardOverlay 
+                questionId={item.id} 
+                isInline={true} 
+                toolProp={isAnnotationMode ? currentTool : 'pointer'} 
+                colorProp={currentColor} 
+            />
             
             {/* Document Header (Lato injected) */}
             <div className="px-8 md:px-14 lg:px-20 pt-12 md:pt-16 pb-8 border-b border-slate-100 relative bg-white" style={{ fontFamily: "'Lato', sans-serif" }}>
@@ -87,6 +119,10 @@ export default function NoteViewer({ item, currentModule }) {
                          prose-h3:font-black prose-h3:text-[1.35rem]
                          prose-strong:font-bold prose-strong:text-slate-900
                          prose-a:text-indigo-600 prose-a:font-semibold
+                         prose-ul:marker:text-slate-300 prose-ol:marker:text-slate-400 prose-ol:marker:font-semibold
+                         prose-table:w-full prose-table:my-10 prose-table:border-collapse prose-table:text-sm md:prose-table:text-base
+                         prose-th:bg-slate-50 prose-th:px-4 prose-th:py-3 prose-th:border prose-th:border-slate-200 prose-th:text-slate-800 prose-th:font-bold prose-th:text-left
+                         prose-td:px-4 prose-td:py-3 prose-td:border prose-td:border-slate-200 prose-td:text-slate-600
                          prose-code:font-mono prose-code:text-[#475569] prose-code:bg-[#e2e8f0] prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:text-[0.85em] prose-code:before:content-none prose-code:after:content-none 
                          prose-pre:bg-[#1d1e22] prose-pre:border prose-pre:border-slate-800 prose-pre:text-slate-50 prose-pre:rounded-md prose-pre:shadow-sm
                          prose-blockquote:border-l-4 prose-blockquote:border-indigo-500 prose-blockquote:bg-slate-50 prose-blockquote:py-2 prose-blockquote:px-6 prose-blockquote:rounded-r-xl prose-blockquote:italic
@@ -94,6 +130,17 @@ export default function NoteViewer({ item, currentModule }) {
               />
             </div>
         </div>
+        
+        {/* Floating Annotation Toolkit */}
+        <FloatingAnnotationToolbar 
+            isAnnotationMode={isAnnotationMode}
+            setIsAnnotationMode={setIsAnnotationMode}
+            currentTool={currentTool}
+            setCurrentTool={setCurrentTool}
+            currentColor={currentColor}
+            setCurrentColor={setCurrentColor}
+            onClear={() => updateWhiteboardData(item.id, [])}
+        />
     </div>
   );
 }
