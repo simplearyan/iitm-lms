@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import useStore from '../../store/useStore';
-import { 
-  Book, Clock, Calendar, FileText, Award, HelpCircle, 
-  User, Menu, LogOut, Database 
+import {
+  Book, Clock, Calendar, FileText, Award, HelpCircle,
+  User, Menu, LogOut, Database
 } from 'lucide-react';
 
 export default function Layout() {
@@ -27,7 +27,7 @@ export default function Layout() {
 
   return (
     <div className="flex min-h-screen bg-slate-50 font-sans text-slate-900 overflow-hidden">
-      
+
       {/* Global Minimal Sidebar (Desktop) */}
       {!isEmbed && (
         <aside className="hidden md:flex w-[72px] bg-[#1a1b1e] flex-col items-center py-6 gap-8 shrink-0 z-50 shadow-xl border-r border-[#2c2e33]">
@@ -38,13 +38,13 @@ export default function Layout() {
           <Link to="/" className={`p-3 rounded-2xl transition-all ${location.pathname === '/' || location.pathname === '/instructor' ? 'bg-white/15 text-white shadow-sm' : 'text-slate-500 hover:text-white hover:bg-white/10'}`} title="Dashboard">
             <Book size={26} strokeWidth={2.5} />
           </Link>
-          <button className="p-3 text-slate-500 hover:text-white hover:bg-white/10 rounded-2xl transition-all" title="Schedule"><Clock size={26} strokeWidth={2.5}/></button>
-          <button className="p-3 text-slate-500 hover:text-white hover:bg-white/10 rounded-2xl transition-all" title="Calendar"><Calendar size={26} strokeWidth={2.5}/></button>
-          <button className="p-3 text-slate-500 hover:text-white hover:bg-white/10 rounded-2xl transition-all" title="Files"><FileText size={26} strokeWidth={2.5}/></button>
-          <button className="p-3 text-slate-500 hover:text-white hover:bg-white/10 rounded-2xl transition-all" title="Grades"><Award size={26} strokeWidth={2.5}/></button>
-          
+          <button className="p-3 text-slate-500 hover:text-white hover:bg-white/10 rounded-2xl transition-all" title="Schedule"><Clock size={26} strokeWidth={2.5} /></button>
+          <button className="p-3 text-slate-500 hover:text-white hover:bg-white/10 rounded-2xl transition-all" title="Calendar"><Calendar size={26} strokeWidth={2.5} /></button>
+          <button className="p-3 text-slate-500 hover:text-white hover:bg-white/10 rounded-2xl transition-all" title="Files"><FileText size={26} strokeWidth={2.5} /></button>
+          <button className="p-3 text-slate-500 hover:text-white hover:bg-white/10 rounded-2xl transition-all" title="Grades"><Award size={26} strokeWidth={2.5} /></button>
+
           <div className="mt-auto flex flex-col gap-4">
-            <button className="p-3 text-slate-500 hover:text-white hover:bg-white/10 rounded-2xl transition-all" title="Help"><HelpCircle size={26} strokeWidth={2.5}/></button>
+            <button className="p-3 text-slate-500 hover:text-white hover:bg-white/10 rounded-2xl transition-all" title="Help"><HelpCircle size={26} strokeWidth={2.5} /></button>
           </div>
         </aside>
       )}
@@ -56,12 +56,12 @@ export default function Layout() {
             <Link to="/" onClick={() => setIsMobileNavOpen(false)} className={`p-3.5 rounded-2xl transition-all ${location.pathname === '/' || location.pathname === '/instructor' ? 'bg-white/15 text-white shadow-sm' : 'text-slate-500 hover:text-white hover:bg-white/10'}`} title="Dashboard">
               <Book size={28} strokeWidth={2.5} />
             </Link>
-            <button className="p-3.5 text-slate-500 hover:text-white hover:bg-white/10 rounded-2xl transition-all"><Clock size={28} strokeWidth={2.5}/></button>
-            <button className="p-3.5 text-slate-500 hover:text-white hover:bg-white/10 rounded-2xl transition-all"><Calendar size={28} strokeWidth={2.5}/></button>
-            <button className="p-3.5 text-slate-500 hover:text-white hover:bg-white/10 rounded-2xl transition-all"><FileText size={28} strokeWidth={2.5}/></button>
-            <button className="p-3.5 text-slate-500 hover:text-white hover:bg-white/10 rounded-2xl transition-all"><Award size={28} strokeWidth={2.5}/></button>
+            <button className="p-3.5 text-slate-500 hover:text-white hover:bg-white/10 rounded-2xl transition-all"><Clock size={28} strokeWidth={2.5} /></button>
+            <button className="p-3.5 text-slate-500 hover:text-white hover:bg-white/10 rounded-2xl transition-all"><Calendar size={28} strokeWidth={2.5} /></button>
+            <button className="p-3.5 text-slate-500 hover:text-white hover:bg-white/10 rounded-2xl transition-all"><FileText size={28} strokeWidth={2.5} /></button>
+            <button className="p-3.5 text-slate-500 hover:text-white hover:bg-white/10 rounded-2xl transition-all"><Award size={28} strokeWidth={2.5} /></button>
             <div className="mt-auto flex flex-col gap-4">
-              <button className="p-3.5 text-slate-500 hover:text-white hover:bg-white/10 rounded-2xl transition-all"><HelpCircle size={28} strokeWidth={2.5}/></button>
+              <button className="p-3.5 text-slate-500 hover:text-white hover:bg-white/10 rounded-2xl transition-all"><HelpCircle size={28} strokeWidth={2.5} /></button>
             </div>
           </div>
         </div>
@@ -69,15 +69,15 @@ export default function Layout() {
 
       {/* Main Content Pane */}
       <main className="flex-1 flex flex-col min-w-0 h-screen relative z-10">
-        
+
         {/* Top Navbar */}
         {!isEmbed && (
           <nav className="h-[72px] bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-8 shrink-0 z-40 shadow-[0_1px_4px_rgba(0,0,0,0.02)] relative">
-            
+
             <div className="flex items-center gap-4">
               {/* Universal Hamburger: Toggles Mobile Nav on Mobile, Toggles Syllabus on Desktop */}
-              <button 
-                className="text-slate-600 p-2 hover:bg-slate-100 rounded-lg transition-colors" 
+              <button
+                className="text-slate-600 p-2 hover:bg-slate-100 rounded-lg transition-colors"
                 onClick={() => {
                   if (window.innerWidth < 768) {
                     setIsMobileNavOpen(true);
@@ -88,7 +88,7 @@ export default function Layout() {
               >
                 <Menu size={24} strokeWidth={2.5} />
               </button>
-              
+
               <Link to="/" className="flex items-center gap-3 md:gap-4 group shrink-0">
                 <div className="w-10 h-10 bg-[#7A1B1E] rounded-full flex items-center justify-center text-white font-black text-lg shadow-inner group-hover:rotate-12 transition-transform shrink-0">
                   I
@@ -104,18 +104,18 @@ export default function Layout() {
                 </div>
               </Link>
             </div>
-            
+
             <div className="flex items-center gap-4 md:gap-8">
               {/* View Switcher toggle */}
               <div className="flex items-center bg-slate-100/80 p-1 rounded-xl border border-slate-200">
-                <button 
+                <button
                   onClick={() => setRole('learner')}
                   className={`px-3 py-1.5 md:px-4 md:py-2 text-[10px] md:text-sm font-bold rounded-lg transition-all ${role === 'learner' ? 'bg-white text-indigo-700 shadow-sm border border-slate-200' : 'text-slate-500 hover:text-slate-800 border border-transparent'}`}
                 >
                   <span className="md:hidden">L</span>
                   <span className="hidden md:inline">Learner</span>
                 </button>
-                <button 
+                <button
                   onClick={() => setRole('instructor')}
                   className={`px-4 py-2 md:px-4 md:py-2 text-[10px] md:text-sm font-bold rounded-lg transition-all ${role === 'instructor' ? 'bg-white text-orange-600 shadow-sm border border-slate-200' : 'text-slate-500 hover:text-slate-800 border border-transparent'}`}
                 >
@@ -123,17 +123,17 @@ export default function Layout() {
                   <span className="hidden md:inline">Instructor</span>
                 </button>
               </div>
-  
+
               {/* Profile Tools (Desktop/Large Only) */}
               <div className="hidden xl:flex items-center gap-3 text-slate-700 font-bold text-sm bg-slate-50 border border-slate-200 px-4 py-2 rounded-xl">
                 <span className="uppercase tracking-widest text-[#7A1B1E]">{user?.name || 'Student Demo'}</span>
                 <User size={18} className="text-slate-400" />
               </div>
-              
+
               <button className="hidden lg:flex text-slate-600 hover:text-slate-900 font-bold items-center gap-1.5 text-sm uppercase tracking-wider">
                 Updates <div className="w-2 h-2 bg-indigo-500 rounded-full mb-3 ml-0.5"></div>
               </button>
-              
+
               <button className="p-2 md:px-5 md:py-2.5 border-2 border-slate-200 rounded-xl hover:bg-slate-50 hover:border-slate-300 text-sm font-bold transition-all shadow-sm">
                 <span className="hidden md:block">SIGN OUT</span>
                 <LogOut size={18} className="md:hidden text-slate-600" strokeWidth={2.5} />
@@ -144,7 +144,7 @@ export default function Layout() {
 
         {/* View Content (Dashboard, Syllabus, etc) */}
         <div className="flex-1 overflow-y-auto bg-slate-50/50 relative">
-           <Outlet />
+          <Outlet />
         </div>
       </main>
     </div>

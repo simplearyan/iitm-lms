@@ -56,7 +56,7 @@ const MarkdownRenderer = ({ content, className = "" }) => {
     }
   }, [content]);
 
-  return <div ref={contentRef} className={`prose prose-sm max-w-none prose-slate prose-headings:font-bold prose-headings:m-0 prose-p:m-0 prose-a:text-blue-600 prose-code:font-mono prose-code:text-[0.85em] prose-pre:bg-slate-800 prose-pre:text-slate-50 prose-pre:my-2 prose-pre:p-3 prose-pre:rounded-md wrap-break-word ${className}`}></div>;
+  return <div ref={contentRef} className={`prose prose-sm md:prose-base max-w-none prose-slate prose-headings:font-bold prose-headings:m-0 prose-p:m-0 prose-a:text-blue-600 prose-code:font-mono prose-code:text-[0.85em] prose-pre:bg-slate-800 prose-pre:text-slate-50 prose-pre:my-2 prose-pre:p-3 prose-pre:rounded-md wrap-break-word ${className}`}></div>;
 };
 
 export default function ActivityEngine({ item, course }) {
@@ -145,173 +145,143 @@ export default function ActivityEngine({ item, course }) {
           {/* Main Question Column - Flex-grow to fill space */}
           <div className="flex-1 flex flex-col bg-white overflow-hidden shadow-sm border border-slate-200 rounded-2xl relative min-w-0 min-h-[400px]">
              
-              {/* Header */}
-              <div className="bg-slate-50 border-b border-slate-200 px-6 py-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 shrink-0">
-                <div className="flex flex-col gap-1">
-                  <div className="flex items-center gap-3">
-                    <h4 className="text-sm font-black text-slate-800 uppercase tracking-tighter">Question {currentQIndex + 1}</h4>
-                    {question?.ai_metadata?.topic && (
-                      <span className="px-2 py-0.5 bg-indigo-50 text-indigo-600 text-[10px] font-black rounded-full border border-indigo-100 uppercase tracking-widest">
-                        {question.ai_metadata.topic}
-                      </span>
-                    )}
-                  </div>
-                  {question?.ai_metadata?.concept && (
-                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">Concept: {question.ai_metadata.concept}</p>
+              {/* SLIM MOBILE HEADER: Context-First Focus */}
+              <div className="bg-slate-50/80 backdrop-blur-sm border-b border-slate-200 px-4 py-3 md:px-6 md:py-4 flex flex-row justify-between items-center gap-4 shrink-0 transition-all">
+                <div className="flex items-center gap-3">
+                  <h4 className="text-base md:text-lg font-black text-slate-800 tracking-tight leading-none uppercase">Question {currentQIndex + 1}</h4>
+                  <div className="h-4 w-px bg-slate-200 hidden sm:block"></div>
+                  {question?.ai_metadata?.topic && (
+                    <span className="hidden sm:inline-flex px-2 py-0.5 bg-slate-100 text-slate-800 text-[10px] font-black rounded border border-slate-300 uppercase tracking-widest whitespace-nowrap">
+                      {question.ai_metadata.topic}
+                    </span>
                   )}
                 </div>
-                <div className="flex items-center gap-4">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest hidden sm:inline">{item.examType || 'Practice Mode'}</span>
-                  <div className="flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 rounded-lg shadow-sm">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span className="text-[10px] font-black text-slate-600 uppercase tracking-tighter">LIVE CANVAS</span>
-                  </div>
-                </div>
-              </div>
-
-             {/* Dynamic Question Canvas Layer */}
-             <div className="flex-1 relative overflow-y-auto p-6 md:p-8">
                 
-                {/* The Inline Whiteboard completely overlaps this container */}
-                <WhiteboardOverlay 
-                    questionId={`${item.id}-${question.id}-inline`} 
-                    isInline={true}
-                    toolProp={wbTool}
-                    colorProp={wbColor}
-                    strokeWidthProp={wbStrokeWidth}
-                />
-
-                {/* The text/options sit beneath it. If wbTool=pointer, clicks pass-through */}
-                <div className="select-none h-full w-full">
-                  <h3 className="text-lg md:text-xl text-slate-900 font-semibold mb-5 leading-relaxed selection:bg-red-100 relative z-0">
-                     <MarkdownRenderer content={question.description || question.text} />
-                  </h3>
-                  
-                  {/* Responsive Question Image */}
-                  {question.image && (
-                    <div className="mb-10 max-w-2xl bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm relative z-0">
-                      <img src={question.image} alt="Question Visual" className="w-full h-auto object-contain bg-slate-50 p-4" />
-                    </div>
-                  )}
-                  
-                  <div className="space-y-4 max-w-3xl relative z-0">
-                  {question.options?.map((opt, oIdx) => {
-                    const ans = activityProgress[question.id];
-                    const isChecked = ans === oIdx || (Array.isArray(ans) && ans.includes(oIdx));
-                    const alphaLabel = String.fromCharCode(65 + oIdx);
-
-                    const labelClass = isChecked 
-                       ? 'border-2 border-[#7A1B1E] bg-red-50 text-[#7A1B1E]' 
-                       : 'border border-slate-300 hover:bg-slate-50 text-slate-800';
-
-                    return (
-                      <label 
-                        key={oIdx} 
-                        className={`flex items-start p-4 md:p-5 rounded-2xl cursor-pointer transition-all ${labelClass}`}
-                      >
-                        <input 
-                          type="radio" 
-                          className="hidden" 
-                          checked={isChecked}
-                          onChange={() => handleOptionSelect(oIdx)}
-                        />
-                        <div className={`
-                          w-6 h-6 rounded-lg border flex items-center justify-center shrink-0 text-xs font-bold transition-all pt-px mr-4
-                          ${isChecked ? 'bg-indigo-600 border-indigo-600 text-white shadow-md' : 'bg-white border-slate-200 text-slate-400 group-hover:border-slate-300'}
-                        `}>
-                             {isChecked ? (
-                                 <CheckCircle2 className="w-4 h-4" />
-                             ) : (
-                                 <span className="text-[10px] font-black text-slate-400">{alphaLabel}</span>
-                             )}
-                        </div>
-                        <div className={`text-base font-semibold pt-px ${isChecked ? 'text-[#7A1B1E]' : 'text-slate-700'}`}>
-                          <MarkdownRenderer content={opt} />
-                        </div>
-                      </label>
-                    )
-                  })}
+                <div className="flex items-center gap-2">
+                  <span className="px-2 py-1 bg-white text-slate-900 text-[9px] md:text-[10px] font-black rounded border border-slate-300 uppercase tracking-widest leading-none shadow-sm">
+                    {item.examType || 'MOCK EXAM FORMAT'}
+                  </span>
                 </div>
               </div>
-            </div>
 
-              {/* Integrated Drawing Toolbar - Compact & Responsive */}
-              <div className="border-t border-slate-200 shrink-0 bg-slate-50 p-2 md:p-3 lg:px-6 lg:py-4 flex flex-col lg:flex-row justify-between items-center gap-3 z-30">
-                  
-                  <div className="flex items-center gap-2 overflow-x-auto w-full lg:w-auto custom-scrollbar-hide pb-1 lg:pb-0">
-                      <div className="flex items-center gap-1 bg-white p-1 rounded-xl border border-slate-200 shrink-0">
-                          <button onClick={() => setWbTool('pointer')} className={`p-1.5 md:p-2 rounded-md transition-colors border ${wbTool==='pointer'?'bg-indigo-100 border-indigo-300 text-indigo-700':'bg-transparent border-transparent text-slate-500 hover:bg-slate-100'}`} title="Pointer"><MousePointer2 size={16}/></button>
-                          <button onClick={() => setWbTool('pen')} className={`p-1.5 md:p-2 rounded-md transition-colors border ${wbTool==='pen'?'bg-indigo-100 border-indigo-300 text-indigo-700':'bg-transparent border-transparent text-slate-500 hover:bg-slate-100'}`} title="Pen"><PenTool size={16}/></button>
-                          <button onClick={() => setWbTool('eraser')} className={`p-1.5 md:p-2 rounded-md transition-colors border ${wbTool==='eraser'?'bg-indigo-100 border-indigo-300 text-indigo-700':'bg-transparent border-transparent text-slate-500 hover:bg-slate-100'}`} title="Eraser"><Eraser size={16}/></button>
+              {/* COMPACT HIGH-FOCUS CONTENT: Question Accent #7A1B1E */}
+              <div className="flex-1 relative overflow-y-auto w-full custom-scrollbar bg-white">
+                 <div className="max-w-4xl px-3 py-6 md:px-6 md:py-10">
+                    <WhiteboardOverlay 
+                        questionId={`${item.id}-${question.id}-inline`} 
+                        isInline={true}
+                        toolProp={wbTool}
+                        colorProp={wbColor}
+                        strokeWidthProp={wbStrokeWidth}
+                    />
+
+                 {/* Question Canvas: Academic Stylization per Reference Image */}
+                 <div className="select-none h-full w-full">
+                   <div className="mb-8">
+                     <h3 className="text-[1.2rem] [&_p]:text-[1.2rem] [&_p]:text-slate-900 text-slate-900 font-bold leading-relaxed selection:bg-indigo-100 relative z-0">
+                        <MarkdownRenderer content={question.description || question.text} />
+                     </h3>
+                   </div>
+                   
+                   {question.image && (
+                     <div className="mb-12 max-w-full bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm relative z-0">
+                       <img src={question.image} alt="Context" className="w-full h-auto object-contain bg-slate-50 p-6 mx-auto max-h-[500px]" />
+                     </div>
+                   )}
+                   
+                   <div className="space-y-6 max-w-4xl relative z-0">
+                   {question.options?.map((opt, oIdx) => {
+                     const ans = activityProgress[question.id];
+                     const isChecked = ans === oIdx || (Array.isArray(ans) && ans.includes(oIdx));
+                     const alphaLabel = String.fromCharCode(65 + oIdx);
+ 
+                     const labelClass = isChecked 
+                        ? 'border-2 border-indigo-600 bg-indigo-50/20' 
+                        : 'border border-slate-200 hover:border-slate-300 hover:bg-slate-50/50';
+ 
+                     return (
+                       <label 
+                         key={oIdx} 
+                         className={`flex items-start p-4 md:p-5 rounded-xl cursor-pointer transition-all ${labelClass}`}
+                       >
+                         <input type="radio" className="hidden" checked={isChecked} onChange={() => handleOptionSelect(oIdx)} />
+                         <div className={`
+                           w-7 h-7 rounded-full border-2 flex items-center justify-center shrink-0 text-[10px] font-black transition-all mr-5
+                           ${isChecked ? 'bg-indigo-600 border-indigo-600 text-white shadow-md' : 'bg-white border-slate-200 text-slate-400'}
+                         `}>
+                              {alphaLabel}
+                         </div>
+                         <div className={`text-base md:text-lg font-medium pt-0.5 leading-relaxed ${isChecked ? 'text-indigo-950 font-bold underline decoration-indigo-200 underline-offset-4' : 'text-slate-800'}`}>
+                           <MarkdownRenderer content={opt}/>
+                         </div>
+                       </label>
+                     )
+                   })}
+                 </div>
+               </div>
+              </div>
+             </div>
+
+              {/* UNIFIED CONTROL BAR: Tools + Navigation (v2 Focus) */}
+              <div className="border-t border-slate-200 bg-white/95 backdrop-blur-md z-30 shrink-0">
+                  {/* Drawing Tools: Single Row Focus */}
+                  <div className="px-4 py-2 flex items-center justify-between gap-4 border-b border-slate-100">
+                      <div className="flex items-center gap-1.5 overflow-x-auto custom-scrollbar-hide bg-slate-50 p-1 rounded-xl">
+                          <button onClick={() => setWbTool('pointer')} className={`p-1.5 rounded-lg transition-all ${wbTool==='pointer'?'bg-indigo-600 text-white shadow-sm':'text-slate-500 hover:bg-white'}`}><MousePointer2 size={16}/></button>
+                          <button onClick={() => setWbTool('pen')} className={`p-1.5 rounded-lg transition-all ${wbTool==='pen'?'bg-indigo-600 text-white shadow-sm':'text-slate-500 hover:bg-white'}`}><PenTool size={16}/></button>
+                          <button onClick={() => setWbTool('eraser')} className={`p-1.5 rounded-lg transition-all ${wbTool==='eraser'?'bg-indigo-600 text-white shadow-sm':'text-slate-500 hover:bg-white'}`}><Eraser size={16}/></button>
+                          <div className="w-px h-5 bg-slate-200 mx-1"></div>
+                          {['#ef4444', '#3b82f6', '#10b981', '#0f172a'].map(c => (
+                              <button key={c} onClick={()=>setWbColor(c)} className={`w-3.5 h-3.5 rounded-full ring-offset-2 transition-all ${wbColor===c?'ring-2 ring-blue-500 scale-110 shadow-sm':''}`} style={{backgroundColor: c}}></button>
+                          ))}
+                          <div className="w-px h-5 bg-slate-200 mx-1"></div>
+                          <button onClick={() => setWbTool('line')} className={`p-1.5 rounded-md ${wbTool==='line'?'bg-indigo-100 text-indigo-700':'text-slate-500'}`}><Minus size={16}/></button>
+                          <button onClick={() => setWbTool('rectangle')} className={`p-1.5 rounded-md ${wbTool==='rectangle'?'bg-indigo-100 text-indigo-700':'text-slate-500'}`}><Square size={16}/></button>
                       </div>
-
-                      {wbTool !== 'pointer' && wbTool !== 'eraser' && (
-                          <div className="flex items-center bg-white p-1 rounded-xl border border-slate-200 gap-1 shrink-0">
-                              <div className="flex gap-1 px-1">
-                                  {['#ef4444', '#3b82f6', '#10b981', '#0f172a'].map(c => (
-                                      <button key={c} onClick={()=>setWbColor(c)} className={`w-4 h-4 rounded-full ${wbColor===c?'ring-2 ring-offset-1 ring-blue-500':''}`} style={{backgroundColor: c}}></button>
-                                  ))}
-                              </div>
-                          </div>
-                      )}
-
-                      <div className="flex items-center gap-1 bg-white p-1 rounded-xl border border-slate-200 shrink-0">
-                          <button onClick={() => setWbTool('line')} className={`p-1.5 rounded-md ${wbTool==='line'?'bg-indigo-50 text-indigo-600':'text-slate-500'}`}><Minus size={16}/></button>
-                          <button onClick={() => setWbTool('rectangle')} className={`p-1.5 rounded-md ${wbTool==='rectangle'?'bg-indigo-50 text-indigo-600':'text-slate-500'}`}><Square size={16}/></button>
-                          <button onClick={() => setWbTool('ellipse')} className={`p-1.5 rounded-md ${wbTool==='ellipse'?'bg-indigo-50 text-indigo-600':'text-slate-500'}`}><Circle size={16}/></button>
-                      </div>
+                      <button onClick={() => updateWhiteboardData(`${item.id}-${question.id}-inline`, [])} className="text-[10px] font-black text-red-500 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-all uppercase flex items-center">
+                          <Trash size={12} className="mr-1.5" /> Clear Board
+                      </button>
                   </div>
 
-                  <button onClick={() => updateWhiteboardData(`${item.id}-${question.id}-inline`, [])} className="text-[10px] font-black text-red-500 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors flex items-center shrink-0 uppercase tracking-tighter">
-                      <Trash size={12} className="mr-1" /> Clear Board
-                  </button>
-              </div>
-
-             {/* Exam Controls Footer - Optimized for Thumb Reach */}
-             <div className="bg-white border-t border-slate-200 p-3 md:p-4 flex flex-col-reverse md:flex-row justify-between items-stretch md:items-center gap-3 shrink-0 z-30 relative">
-                 <div className="flex space-x-2 w-full md:w-auto">
-                     <button 
-                         onClick={() => setReview(p => ({...p, [question.id]: !review[question.id]}))}
-                         className={`flex-1 md:flex-none px-4 py-3 md:py-2.5 border rounded-xl font-bold text-[10px] md:text-sm transition-colors flex items-center justify-center ${
-                             review[question.id] 
-                             ? 'bg-amber-400 border-amber-500 text-amber-900 shadow-inner' 
-                             : 'bg-white border-amber-400 text-amber-600 hover:bg-amber-50'
-                         }`}
-                     >
-                         <Bookmark className="w-3.5 h-3.5 md:w-4 md:h-4 mr-1.5 md:mr-2" /> 
-                         <span>{review[question.id] ? 'REMARK' : 'REVIEW'}</span>
-                     </button>
-                     <button 
-                         onClick={() => setActivityProgress(question.id, undefined)}
-                         className="flex-1 md:flex-none px-4 py-3 md:py-2.5 bg-white border border-slate-300 rounded-xl text-slate-600 text-[10px] md:text-sm font-bold hover:bg-slate-50 transition-colors"
-                     >
-                         CLEAR
-                     </button>
-                 </div>
-                 
-                 <div className="flex space-x-2 w-full md:w-auto">
-                     <button 
-                         onClick={() => navigateQuestion(currentQIndex - 1)}
-                         disabled={currentQIndex === 0}
-                         className="flex-1 md:flex-none px-4 py-3 md:py-2.5 border border-slate-300 rounded-xl text-slate-700 font-bold hover:bg-slate-50 disabled:opacity-40 text-[10px] md:text-sm flex items-center justify-center bg-white transition-colors"
-                     >
-                         <ChevronLeft className="w-3.5 h-3.5 md:w-4 md:h-4 mr-1 md:mr-1.5" /> PREV
-                     </button>
-                     
-                     {currentQIndex === questions.length - 1 ? (
-                        <button className="flex-1 md:flex-none px-6 py-3 md:py-2.5 bg-[#7A1B1E] hover:bg-red-900 text-white rounded-xl font-black text-[10px] md:text-sm flex items-center justify-center shadow-md shadow-red-900/20 transition-all uppercase tracking-widest">
-                            SUBMIT
-                        </button>
-                     ) : (
+                  {/* High-Efficiency Navigation Footer */}
+                  <div className="px-4 py-3 md:px-6 flex flex-row items-center justify-between gap-4">
+                      <div className="flex items-center gap-2">
                         <button 
-                            onClick={() => navigateQuestion(currentQIndex + 1)}
-                            className="flex-2 md:flex-none px-6 py-3 md:py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-[10px] md:text-sm flex items-center justify-center shadow-md shadow-emerald-600/20 transition-all uppercase tracking-widest grow"
+                          onClick={() => setReview(p => ({...p, [question.id]: !review[question.id]}))}
+                          className={`px-4 py-2.5 rounded-xl font-black text-[11px] md:text-sm uppercase tracking-widest border transition-all flex items-center gap-2 ${review[question.id] ? 'bg-amber-100 border-amber-300 text-amber-700' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'}`}
                         >
-                            NEXT <ChevronRight className="w-3.5 h-3.5 md:w-4 md:h-4 ml-1 md:mr-1.5" />
+                          <Bookmark size={14} className={review[question.id] ? 'fill-amber-500 transition-all' : ''} /> 
+                          <span>Review</span>
                         </button>
-                     )}
-                 </div>
-             </div>
+                        <button onClick={() => setActivityProgress(question.id, undefined)} className="hidden sm:block px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-400 text-[11px] md:text-sm font-black uppercase tracking-widest hover:text-red-500 transition-all">
+                          Clear
+                        </button>
+                      </div>
+                      
+                      <div className="flex items-center gap-3">
+                        <button 
+                            onClick={() => navigateQuestion(currentQIndex - 1)}
+                            disabled={currentQIndex === 0}
+                            className="h-10 px-5 border border-slate-300 rounded-xl text-slate-700 font-bold hover:bg-slate-50 disabled:opacity-30 text-[11px] md:text-sm flex items-center justify-center transition-all shadow-sm active:scale-95"
+                        >
+                          <ChevronLeft className="w-4 h-4 mr-1.5" /> Prev
+                        </button>
+                        
+                        {currentQIndex === questions.length - 1 ? (
+                           <button className="h-10 px-8 bg-[#7A1B1E] hover:bg-red-900 text-white rounded-xl font-black text-[11px] md:text-sm flex items-center justify-center shadow-lg shadow-red-900/20 active:scale-95 uppercase tracking-[0.2em] transition-all">
+                               Submit
+                           </button>
+                        ) : (
+                           <button 
+                               onClick={() => navigateQuestion(currentQIndex + 1)}
+                               className="h-10 px-8 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-[11px] md:text-sm flex items-center justify-center shadow-lg shadow-emerald-500/20 active:scale-95 uppercase tracking-[0.2em] transition-all"
+                           >
+                               Next <ChevronRight className="w-4 h-4 ml-2" />
+                           </button>
+                        )}
+                      </div>
+                  </div>
+              </div>
 
              {/* STATIC BOTTOM PALETTE: Mobile-Only (Mock-Compatible) */}
              <div className="xl:hidden bg-slate-50 border-t border-slate-200 py-6 flex flex-col items-center gap-4 shrink-0 transition-all">
