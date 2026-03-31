@@ -146,7 +146,7 @@ export default function ActivityEngine({ item, course }) {
           <div className="flex-1 flex flex-col bg-white overflow-hidden shadow-sm border border-slate-200 rounded-2xl relative min-w-0 min-h-[400px]">
              
               {/* SLIM MOBILE HEADER: Context-First Focus */}
-              <div className="bg-slate-50/80 backdrop-blur-sm border-b border-slate-200 px-4 py-3 md:px-6 md:py-4 flex flex-row justify-between items-center gap-4 shrink-0 transition-all">
+              <div className="bg-slate-50/80 backdrop-blur-sm border-b border-slate-200 px-4 py-2 md:px-6 md:py-4 flex flex-row justify-between items-center gap-4 shrink-0 transition-all">
                 <div className="flex items-center gap-3">
                   <h4 className="text-base md:text-lg font-black text-slate-800 tracking-tight leading-none">Question &nbsp; {currentQIndex + 1}</h4>
                   <div className="h-4 w-px bg-slate-200 hidden sm:block"></div>
@@ -166,7 +166,7 @@ export default function ActivityEngine({ item, course }) {
 
               {/* COMPACT HIGH-FOCUS CONTENT: Question Accent #7A1B1E */}
               <div className="flex-1 relative overflow-y-auto w-full custom-scrollbar bg-white">
-                 <div className="max-w-4xl px-3 py-6 md:px-6 md:py-10">
+                 <div className="max-w-4xl px-3 py-4 md:px-6 md:py-10">
                     <WhiteboardOverlay 
                         questionId={`${item.id}-${question.id}-inline`} 
                         isInline={true}
@@ -177,14 +177,14 @@ export default function ActivityEngine({ item, course }) {
 
                  {/* Question Canvas: Academic Stylization per Reference Image */}
                  <div className="select-none h-full w-full">
-                   <div className="mb-8">
+                   <div className="mb-4 md:mb-8">
                      <h3 className="text-[1.3rem] [&_p]:text-[1.3rem] [&_li]:text-[1.3rem] [&_p]:text-slate-900 [&_li]:text-slate-900 text-slate-900 font-bold leading-relaxed selection:bg-[#7A1B1E]/10 relative z-0">
                         <MarkdownRenderer content={question.description || question.text} />
                      </h3>
                    </div>
                    
                    {question.image && (
-                     <div className="mb-12 max-w-full bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm relative z-0">
+                     <div className="mb-6 md:mb-12 max-w-full bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm relative z-0">
                        <img src={(import.meta.env.BASE_URL || '/') + (question.image ? question.image.replace(/^\//, '') : '')} alt="Context" className="w-full h-auto object-contain bg-slate-50 p-6 mx-auto max-h-[500px]" />
                      </div>
                    )}
@@ -202,7 +202,7 @@ export default function ActivityEngine({ item, course }) {
                      return (
                        <label 
                          key={oIdx} 
-                         className={`flex items-start p-4 md:p-5 rounded-xl cursor-pointer transition-all ${labelClass}`}
+                         className={`flex items-start p-2.5 md:p-5 rounded-xl cursor-pointer transition-all ${labelClass}`}
                        >
                          <input type="radio" className="hidden" checked={isChecked} onChange={() => handleOptionSelect(oIdx)} />
                          <div className={`
@@ -217,7 +217,34 @@ export default function ActivityEngine({ item, course }) {
                        </label>
                      )
                    })}
-                 </div>
+                  </div>
+                  {/* INTEGRATED QUESTION PALETTE: Mobile-Only (Scroll-to-Navigation) */}
+                  <div className="mt-12 mb-8 xl:hidden border-t border-slate-100 pt-8">
+                    <div className="flex flex-col items-center mb-6">
+                        <div className="w-12 h-1.5 bg-slate-100 rounded-full mb-4"></div>
+                        <span className="text-[10px] font-bold text-[#7A1B1E] uppercase tracking-[0.25em]">Question Hub</span>
+                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">Navigation Grid</span>
+                    </div>
+                    
+                    <div className="flex flex-wrap justify-center gap-3 max-w-sm mx-auto px-4">
+                       {questions.map((q, idx) => {
+                         const status = getStatus(q.id);
+                         let btnClass = "w-11 h-11 rounded-2xl flex items-center justify-center text-[13px] font-black cursor-pointer transition-all border-2 ";
+                         if (status === 'answered') btnClass += "bg-emerald-500 text-white border-emerald-600 shadow-sm";
+                         else if (status === 'unanswered') btnClass += "bg-red-500 text-white border-red-600 shadow-sm";
+                         else if (status === 'review') btnClass += "bg-amber-400 text-amber-900 border-amber-500 shadow-sm";
+                         else if (status === 'answered-review') btnClass += "bg-emerald-500 text-white border-2 border-amber-400 ring-2 ring-amber-400 shadow-sm";
+                         else btnClass += "bg-white text-slate-500 border-slate-200 hover:bg-slate-50";
+                         if (currentQIndex === idx) btnClass += " ring-2 ring-offset-2 ring-[#7A1B1E] scale-110 shadow-lg shadow-[#7A1B1E]/10";
+                         return (
+                           <button key={idx} onClick={() => navigateQuestion(idx)} className={btnClass}>
+                             {idx + 1}
+                           </button>
+                         );
+                       })}
+                    </div>
+                    <div className="mt-8 text-center text-[9px] font-bold text-slate-300 uppercase tracking-[0.2em]">— END OF ASSESSMENT —</div>
+                  </div>
                </div>
               </div>
              </div>
@@ -244,7 +271,7 @@ export default function ActivityEngine({ item, course }) {
                   </div>
 
                   {/* High-Efficiency Navigation Footer */}
-                  <div className="px-4 py-3 md:px-6 flex flex-row items-center justify-between gap-4">
+                  <div className="px-4 py-2 md:px-6 flex flex-row items-center justify-between gap-4">
                       <div className="flex items-center gap-2">
                         <button 
                           onClick={() => setReview(p => ({...p, [question.id]: !review[question.id]}))}
@@ -284,37 +311,7 @@ export default function ActivityEngine({ item, course }) {
               </div>
 
              {/* STATIC BOTTOM PALETTE: Mobile-Only (Mock-Compatible) */}
-             <div className="xl:hidden bg-slate-50 border-t border-slate-200 py-6 flex flex-col items-center gap-4 shrink-0 transition-all">
-                <div className="flex flex-col items-center text-center px-4">
-                    <span className="text-[10px] font-bold text-slate-800 uppercase tracking-[0.2em] mb-1">QUIZ 1 - 2024</span>
-                    <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">{course?.code || 'CS101'} • {item.title?.toUpperCase() || 'MOCK PRACTICE'}</span>
-                </div>
-                
-                <div className="flex flex-wrap justify-center gap-2.5 max-w-full px-6">
-                   {questions.map((q, idx) => {
-                     const status = getStatus(q.id);
-                     let btnClass = "w-9 h-9 rounded-full flex items-center justify-center text-[12px] font-black cursor-pointer transition-all border-2 ";
-                     
-                     if (status === 'answered') btnClass += "bg-emerald-500 text-white border-emerald-600 shadow-sm";
-                     else if (status === 'unanswered') btnClass += "bg-red-500 text-white border-red-600 shadow-sm";
-                     else if (status === 'review') btnClass += "bg-amber-400 text-amber-900 border-amber-500 shadow-sm";
-                     else if (status === 'answered-review') btnClass += "bg-emerald-500 text-white border-2 border-amber-400 ring-2 ring-amber-400 shadow-sm";
-                     else btnClass += "bg-white text-slate-400 border-slate-200 hover:bg-slate-50";
-
-                     if (currentQIndex === idx) btnClass += " ring-2 ring-offset-2 ring-slate-800 scale-105 z-10";
-
-                     return (
-                       <button 
-                         key={q.id}
-                         onClick={() => navigateQuestion(idx)}
-                         className={btnClass}
-                       >
-                         {idx + 1}
-                       </button>
-                     );
-                   })}
-                </div>
-             </div>
+              {/* Fixed mobile footer removed for vertical space optimization */}
           </div>
 
           {/* SIDE PALETTE: Desktop (xl+) Only */}
