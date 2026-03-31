@@ -148,7 +148,7 @@ export default function ActivityEngine({ item, course }) {
               {/* SLIM MOBILE HEADER: Context-First Focus */}
               <div className="bg-slate-50/80 backdrop-blur-sm border-b border-slate-200 px-4 py-3 md:px-6 md:py-4 flex flex-row justify-between items-center gap-4 shrink-0 transition-all">
                 <div className="flex items-center gap-3">
-                  <h4 className="text-base md:text-lg font-black text-slate-800 tracking-tight leading-none uppercase">Question {currentQIndex + 1}</h4>
+                  <h4 className="text-base md:text-lg font-black text-slate-800 tracking-tight leading-none">Question &nbsp; {currentQIndex + 1}</h4>
                   <div className="h-4 w-px bg-slate-200 hidden sm:block"></div>
                   {question?.ai_metadata?.topic && (
                     <span className="hidden sm:inline-flex px-2 py-0.5 bg-slate-100 text-slate-800 text-[10px] font-black rounded border border-slate-300 uppercase tracking-widest whitespace-nowrap">
@@ -158,8 +158,8 @@ export default function ActivityEngine({ item, course }) {
                 </div>
                 
                 <div className="flex items-center gap-2">
-                  <span className="px-2 py-1 bg-white text-slate-900 text-[9px] md:text-[10px] font-black rounded border border-slate-300 uppercase tracking-widest leading-none shadow-sm">
-                    {item.examType || 'MOCK EXAM FORMAT'}
+                  <span className="px-2 py-1 bg-slate-100 text-slate-800 text-[9px] md:text-[10px] font-black rounded border border-slate-300 uppercase tracking-widest leading-none">
+                    {item.examType || 'MOCK PRACTICE'}
                   </span>
                 </div>
               </div>
@@ -178,7 +178,7 @@ export default function ActivityEngine({ item, course }) {
                  {/* Question Canvas: Academic Stylization per Reference Image */}
                  <div className="select-none h-full w-full">
                    <div className="mb-8">
-                     <h3 className="text-[1.2rem] [&_p]:text-[1.2rem] [&_p]:text-slate-900 text-slate-900 font-bold leading-relaxed selection:bg-indigo-100 relative z-0">
+                     <h3 className="text-[1.5rem] [&_p]:text-[1.3rem] [&_p]:text-slate-900 text-slate-900 font-bold leading-relaxed selection:bg-indigo-100 relative z-0">
                         <MarkdownRenderer content={question.description || question.text} />
                      </h3>
                    </div>

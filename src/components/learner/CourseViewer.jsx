@@ -179,15 +179,16 @@ export default function CourseViewer() {
               </div>
             )}
 
-            {/* Context Header (Visible for Quiz/Term Exam/Assignments) */}
+            {/* Context Header (Small Strip for Quiz/Term Exam/Assignments) */}
             {activeItem.type !== 'activity' && activeItem.type !== 'video' && activeItem.type !== 'note' && (
-              <div className="m-4 md:m-8 mb-4 border-b pb-4 border-slate-100 pr-12 md:pr-24">
-                 <div className="text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-2 flex items-center gap-2">
+              <div className="px-4 py-2 md:px-8 md:py-2.5 bg-slate-50/50 border-b border-slate-200 flex flex-col md:flex-row md:items-center gap-1 md:gap-4 shrink-0 transition-all">
+                 <div className="flex items-center gap-2 text-[9px] font-bold tracking-widest text-slate-400 uppercase shrink-0">
                    <span>{currentModule?.title}</span>
                    <span className="w-1 h-1 rounded-full bg-slate-300"></span>
                    <span className={activeItem.type === 'activity' ? 'text-orange-500' : (activeItem.type === 'video' ? 'text-blue-500' : 'text-emerald-500')}>{activeItem.type}</span>
                  </div>
-                 <h1 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight leading-tight">{activeItem.title}</h1>
+                 <div className="h-3 w-px bg-slate-200 hidden md:block shrink-0"></div>
+                 <h1 className="text-sm md:text-base font-bold text-slate-800 tracking-tight leading-tight truncate">{activeItem.title}</h1>
               </div>
             )}
 
