@@ -1,23 +1,32 @@
 import React from 'react';
 import useStore from '../../store/useStore';
-import { Database, Plus, Edit2, Archive } from 'lucide-react';
+import { Database, Plus, Edit2, Archive, RotateCcw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function InstructorDashboard() {
-  const { courses, exportData } = useStore();
+  const { courses, exportData, isLocalDraft, resetToRemote } = useStore();
 
   return (
     <div className="p-6 lg:p-10 max-w-7xl mx-auto w-full animate-fade-in">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
         <div>
-          <h1 className="text-3xl lg:text-4xl font-black text-orange-600 tracking-tight">Authoring Dashboard</h1>
-          <p className="mt-2 text-slate-500 font-medium text-lg">Manage courses and deploy content</p>
+          <h1 className="text-3xl lg:text-4xl font-black text-orange-600 tracking-tight leading-none uppercase">Authoring Studio</h1>
+          <p className="mt-2 text-slate-400 font-bold text-sm uppercase tracking-widest">Global Content Management & Live Sync</p>
         </div>
         
-        <div className="flex gap-4">
-          <button onClick={exportData} className="px-6 py-3 bg-slate-900 hover:bg-black text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all flex items-center gap-3">
-            <Database className="w-5 h-5"/>
-            Export Database (data.json)
+        <div className="flex flex-wrap gap-3">
+          {isLocalDraft && (
+            <button 
+              onClick={resetToRemote}
+              className="px-5 py-3 bg-white text-red-500 hover:bg-red-50 font-black text-[11px] uppercase tracking-widest rounded-xl border border-red-100 transition-all flex items-center gap-2 shadow-sm"
+            >
+              <RotateCcw className="w-4 h-4"/>
+              Reset to Server
+            </button>
+          )}
+          <button onClick={exportData} className="px-6 py-3 bg-slate-900 hover:bg-black text-white font-black text-[11px] uppercase tracking-widest rounded-xl shadow-md hover:shadow-lg transition-all flex items-center gap-3">
+            <Database className="w-4 h-4"/>
+            Export Chunks
           </button>
         </div>
       </div>

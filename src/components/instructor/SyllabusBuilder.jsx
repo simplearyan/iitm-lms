@@ -67,6 +67,7 @@ export default function SyllabusBuilder() {
   const { courseId } = useParams();
   const { 
     courses, setCourses, exportData, 
+    questions: globalQuestions, // Access Global Bank
     currentYear, setYear, 
     currentTerm, setTerm, 
     generateSemanticId 
@@ -77,6 +78,7 @@ export default function SyllabusBuilder() {
   
   const [activeModuleId, setActiveModuleId] = useState(course?.modules?.[0]?.id);
   const [editingItemId, setEditingItemId] = useState(null);
+  const [selectedQIndex, setSelectedQIndex] = useState(0); // For V2 Navigator Sidebar
 
   if (!course) return <div className="p-10 text-center font-bold text-slate-500">Course not found</div>;
 
@@ -341,40 +343,56 @@ export default function SyllabusBuilder() {
       </div>
 
        {/* Content Inspector Slide-over */}
-       {editingItemId && activeModule?.items?.find(i => i.id === editingItemId) && (() => {
+       {editingItemId && (() => {
          const editingItem = activeModule.items.find(i => i.id === editingItemId);
+         if (!editingItem) return null;
+
+         const updateEditingItem = (field, value) => {
+            const updated = [...courses];
+            const mIdx = course.modules.findIndex(m => m.id === activeModuleId);
+            const iIdx = updated[courseIndex].modules[mIdx].items.findIndex(i => i.id === editingItemId);
+            updated[courseIndex].modules[mIdx].items[iIdx][field] = value;
+            setCourses(updated);
+         };
+
          return (
-         <div className="fixed inset-0 z-100 flex items-center justify-center p-4 sm:p-6">
-            <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-[2px] animate-in fade-in" onClick={() => setEditingItemId(null)}></div>
-            <div className="w-full max-w-4xl bg-white shadow-2xl relative flex flex-col max-h-[90vh] overflow-hidden animate-in fade-in zoom-in-95 rounded-2xl border border-slate-200">
+         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-6xl h-[90vh] overflow-hidden flex flex-col border border-white/20 animate-in zoom-in-95 duration-200">
                
-               <div className="bg-slate-900 text-white px-6 py-4 flex justify-between items-center shrink-0">
-                  <div className="flex flex-col">
-                    <span className="text-[10px] font-black text-slate-500 tracking-[0.2em] mb-0.5 leading-none">{editingItem.id}</span>
-                    <h3 className="font-black text-sm tracking-tight flex items-center gap-2">
-                       <Edit3 className="w-4 h-4 text-blue-400 uppercase"/> CONTENT EDITOR
-                    </h3>
+               <div className="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-900 text-white shrink-0">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg transform -rotate-3">
+                       <Edit3 className="text-white w-6 h-6"/>
+                    </div>
+                    <div>
+                        <div className="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em]">{editingItem.id}</div>
+                        <h3 className="font-black text-xl tracking-tight leading-none">Content Editor</h3>
+                    </div>
                   </div>
-                  <button onClick={() => setEditingItemId(null)} className="text-slate-500 hover:text-white transition-colors "><X className="w-6 h-6"/></button>
+                  <button onClick={() => setEditingItemId(null)} className="text-slate-400 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-xl">
+                     <X size={24}/>
+                  </button>
                </div>
-               
-               <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6 custom-scrollbar bg-white">
-                  <div>
-                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Internal Reference Title</label>
-                    <input 
-                      className="w-full p-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-100 font-bold text-slate-800 transition-all"
-                      value={editingItem.title || ''}
-                      onChange={(e) => updateEditingItem('title', e.target.value)}
-                    />
+
+               <div className="flex-1 overflow-y-auto p-6 bg-slate-50/30 custom-scrollbar">
+                  <div className="mb-8">
+                     <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Internal Reference Title</label>
+                     <input 
+                        type="text" 
+                        value={editingItem.title} 
+                        onChange={(e) => updateEditingItem('title', e.target.value)}
+                        className="w-full text-lg font-extrabold text-slate-800 bg-white border border-slate-200 rounded-xl px-5 py-3 focus:outline-none focus:ring-4 focus:ring-blue-100 transition-all shadow-sm"
+                        placeholder="Item Title..."
+                     />
                   </div>
 
                   {editingItem.type === 'video' && (
                     <>
-                      <div>
-                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">YouTube URL</label>
+                      <div className="mb-6">
+                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Video Endpoint (Vimeo/YT ID)</label>
                         <input 
-                          className="w-full p-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-100 font-bold text-slate-800 transition-all placeholder:text-slate-300"
-                          placeholder="https://youtube.com/embed/..."
+                          type="text"
+                          className="w-full p-4 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-100 font-mono text-sm leading-relaxed text-slate-800 bg-slate-50/30"
                           value={editingItem.url || ''}
                           onChange={(e) => updateEditingItem('url', e.target.value)}
                         />
@@ -415,7 +433,10 @@ export default function SyllabusBuilder() {
                   )}
 
                   {['activity', 'assignment', 'quiz'].includes(editingItem.type) && (() => {
-                    const safeQuestions = editingItem.questions || [];
+                    let safeQuestions = editingItem.questions || [];
+                    if (safeQuestions.length === 0 && editingItem.questionIds) {
+                        safeQuestions = editingItem.questionIds.map(id => globalQuestions.find(q => q.id === id)).filter(Boolean);
+                    }
 
                     const updateQuestion = (qIndex, field, value) => {
                         const newQs = [...safeQuestions];
@@ -433,133 +454,114 @@ export default function SyllabusBuilder() {
                             solution: ''
                         }];
                         updateEditingItem('questions', newQs);
+                        setSelectedQIndex(newQs.length - 1);
                     };
 
                     const removeQuestion = (qIndex) => {
                         if (safeQuestions.length <= 1) return;
                         const newQs = safeQuestions.filter((_, idx) => idx !== qIndex);
                         updateEditingItem('questions', newQs);
+                        if (selectedQIndex >= newQs.length) setSelectedQIndex(newQs.length - 1);
                     }
 
+                    const activeQ = safeQuestions[selectedQIndex] || safeQuestions[0] || {};
+
                     return (
-                    <div className="space-y-8">
-                       {editingItem.type === 'quiz' && (
-                        <div className="bg-purple-50/50 p-4 rounded-xl border border-purple-100 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 shadow-inner relative overflow-hidden">
-                             <div>
-                               <label className="block text-[9px] font-black text-purple-600 uppercase tracking-widest mb-1">Type</label>
-                               <select 
-                                 className="w-full p-2 bg-white border border-purple-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-200 text-xs font-bold text-slate-800"
-                                 value={editingItem.examType || 'Quiz 1'}
-                                 onChange={(e) => updateEditingItem('examType', e.target.value)}
-                               >
-                                 <option>Mock Practice</option>
-                                 <option>Graded Assignment</option>
-                                 <option>Quiz 1</option>
-                                 <option>Quiz 2</option>
-                                 <option>End Term</option>
-                               </select>
-                             </div>
-                            <div>
-                              <label className="block text-[9px] font-black text-purple-600 uppercase tracking-widest mb-1">Duration (Min)</label>
-                              <input 
-                                type="number"
-                                className="w-full p-2 bg-white border border-purple-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-200 text-xs font-bold text-slate-800"
-                                value={editingItem.duration || 30}
-                                onChange={(e) => updateEditingItem('duration', parseInt(e.target.value) || 0)}
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-[9px] font-black text-purple-600 uppercase tracking-widest mb-1">Marks</label>
-                              <input 
-                                type="number"
-                                className="w-full p-2 bg-white border border-purple-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-200 text-xs font-bold text-slate-800"
-                                value={editingItem.totalMarks || 10}
-                                onChange={(e) => updateEditingItem('totalMarks', parseInt(e.target.value) || 0)}
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-[9px] font-black text-purple-600 uppercase tracking-widest mb-1">Release Policy</label>
-                              <select 
-                                className="w-full p-2 bg-white border border-purple-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-200 text-xs font-bold text-slate-800"
-                                value={editingItem.submissionRule || 'anytime'}
-                                onChange={(e) => updateEditingItem('submissionRule', e.target.value)}
-                              >
-                                <option value="anytime">Open Access</option>
-                                <option value="last_10_mins">Final 10 Mins</option>
-                                <option value="auto_only">Strict Auto</option>
-                              </select>
-                            </div>
-                        </div>
-                       )}
+                        <div className="flex flex-col h-[65vh] -mx-6 -mt-3">
+                           <div className="flex-1 flex overflow-hidden">
+                              {/* Pane 1: Question Navigator Sidebar */}
+                              <div className="w-16 md:w-56 border-r border-slate-200 bg-slate-50/50 flex flex-col shrink-0">
+                                 <div className="p-4 border-b border-slate-200 flex justify-between items-center bg-white">
+                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest hidden md:block">Questions</span>
+                                    <button onClick={addQuestion} className="p-1 hover:bg-slate-100 rounded text-slate-500"><Plus size={16}/></button>
+                                 </div>
+                                 <div className="flex-1 overflow-y-auto p-2 space-y-1 custom-scrollbar">
+                                    {safeQuestions.map((q, idx) => (
+                                        <button 
+                                          key={q.id} 
+                                          onClick={() => setSelectedQIndex(idx)}
+                                          className={`w-full p-3 rounded-lg text-left transition-all flex items-center gap-3 relative group ${selectedQIndex === idx ? 'bg-white border border-slate-200 shadow-sm text-blue-600' : 'text-slate-500 hover:bg-slate-100'}`}
+                                        >
+                                           <span className={`w-6 h-6 rounded flex items-center justify-center text-[10px] font-black shrink-0 ${selectedQIndex === idx ? 'bg-blue-600 text-white shadow-sm' : 'bg-slate-200 text-slate-500'}`}>{idx + 1}</span>
+                                           <span className="text-[11px] font-bold truncate hidden md:block">{q.id.split('_').pop()}</span>
+                                           <button onClick={(e) => { e.stopPropagation(); removeQuestion(idx); }} className="absolute right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 text-slate-300 hover:text-red-500 hidden md:block"><Trash2 size={12}/></button>
+                                        </button>
+                                    ))}
+                                 </div>
+                              </div>
 
-                       {safeQuestions.map((q, qIndex) => (
-                        <div key={q.id} className="p-4 bg-slate-100/50 border border-slate-200 rounded-xl relative group transition-all hover:bg-slate-100/80">
-                           <button onClick={() => removeQuestion(qIndex)} className="absolute top-3 right-3 text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                             <Trash2 className="w-4 h-4"/>
-                           </button>
-                           
-                           <h4 className="font-black text-slate-800 mb-4 flex items-center text-xs tracking-tight">
-                              <span className="bg-slate-900 text-white w-5 h-5 rounded flex items-center justify-center text-[10px] mr-2 shadow-sm">{qIndex + 1}</span> 
-                              {q.id}
-                           </h4>
-                           
-                           {/* Question Task */}
-                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                               <div className="flex flex-col">
-                                   <label className="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Question Body</label>
-                                   <textarea rows="4" value={q.description || ''} onChange={e => updateQuestion(qIndex, 'description', e.target.value)} className="w-full p-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-100 font-mono text-xs text-slate-800 bg-white" placeholder="Problem statement..." />
-                               </div>
-                               <div className="flex flex-col min-w-0">
-                                   <label className="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Preview</label>
-                                   <div className="p-3 bg-white border border-slate-200 rounded-lg overflow-y-auto max-h-[120px] shadow-inner text-sm min-w-0">
-                                      <MarkdownPreviewBlock content={q.description || ""} />
-                                   </div>
-                               </div>
-                           </div>
-
-                           {/* Options Grid */}
-                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
-                               {(q.options || []).map((opt, oIdx) => (
-                                   <div key={oIdx} className={`flex items-start gap-2 bg-white p-2 rounded-lg border transition-all ${q.answer === oIdx ? 'border-green-300 bg-green-50/10' : 'border-slate-200'}`}>
-                                       <input 
-                                           type="radio" 
-                                           name={`ans_${q.id}`} 
-                                           checked={q.answer === oIdx}
-                                           onChange={() => updateQuestion(qIndex, 'answer', oIdx)}
-                                           className="mt-1.5 w-3.5 h-3.5 accent-green-600 shrink-0"
-                                       />
-                                       <div className="flex-1 min-w-0">
-                                           <input 
-                                               type="text" 
-                                               value={opt} 
-                                               onChange={e => {
-                                                   let nOpts = [...(q.options || [])];
-                                                   nOpts[oIdx] = e.target.value;
-                                                   updateQuestion(qIndex, 'options', nOpts);
-                                               }} 
-                                               className="w-full border-b border-slate-100 focus:border-blue-300 pb-0.5 mb-1 bg-transparent focus:outline-none text-xs font-bold text-slate-800" 
-                                               placeholder="Option text..."
-                                           />
-                                           <div className="text-[10px] text-slate-400 py-1 bg-slate-50/50 rounded px-1 opacity-60">
-                                               <MarkdownPreviewBlock content={opt || ""} />
-                                           </div>
+                              <div className="flex-1 flex flex-col overflow-hidden">
+                                 {safeQuestions.length === 0 ? (
+                                    <div className="flex-1 flex flex-col items-center justify-center text-slate-400 p-10 text-center">
+                                       <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4"><Plus size={24}/></div>
+                                       <p className="font-bold">No questions added.</p>
+                                       <button onClick={addQuestion} className="mt-4 px-6 py-2 bg-slate-900 text-white rounded-lg text-xs font-black uppercase">Start Authoring</button>
+                                    </div>
+                                 ) : (
+                                 <div className="flex-1 flex flex-col md:flex-row overflow-hidden bg-white">
+                                    {/* EDITOR COLUMN */}
+                                    <div className="flex-1 flex flex-col border-r border-slate-100 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+                                       <div className="space-y-3">
+                                          <div className="flex justify-between items-center">
+                                             <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Problem Task (Markdown + KaTeX)</label>
+                                             <span className="text-[9px] font-bold text-blue-500 bg-blue-50 px-2 py-0.5 rounded uppercase">{activeQ.id}</span>
+                                          </div>
+                                          <textarea 
+                                             rows="4" 
+                                             value={activeQ.description || ''} 
+                                             onChange={e => updateQuestion(selectedQIndex, 'description', e.target.value)} 
+                                             className="w-full p-4 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-100 font-mono text-xs text-slate-800 bg-slate-50/10 placeholder:opacity-40" 
+                                             placeholder="Enter problem statement with $math$ and **bold** labels..." 
+                                          />
                                        </div>
-                                   </div>
-                               ))}
-                           </div>
 
-                           {/* Solution */}
-                           <div>
-                               <label className="block text-[9px] font-black text-amber-600 uppercase tracking-widest mb-1 ml-1">Solution Reasoning</label>
-                               <textarea rows="2" value={q.solution || ""} onChange={e => updateQuestion(qIndex, 'solution', e.target.value)} className="w-full p-2.5 border border-amber-100 bg-amber-50/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-200 font-mono text-xs text-amber-900" placeholder="Step-by-step logic..." />
+                                       <div className="space-y-4">
+                                          <div className="flex justify-between items-center border-b border-slate-100 pb-2">
+                                             <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Assessment Options</label>
+                                             <button onClick={() => updateQuestion(selectedQIndex, 'options', [...(activeQ.options || []), `New Option`])} className="px-2 py-1 bg-green-50 text-green-600 hover:bg-green-100 rounded-md text-[9px] font-black uppercase transition-colors border border-green-100 flex items-center gap-1"><Plus size={10}/> Add Option</button>
+                                          </div>
+                                          <div className="grid grid-cols-1 gap-2">
+                                             {(activeQ.options || []).map((opt, oIdx) => (
+                                                 <div key={oIdx} className={`flex items-center gap-3 p-2 bg-white rounded-xl border group transition-all ${activeQ.answer === oIdx ? 'border-emerald-500 bg-emerald-50/30' : 'border-slate-100 hover:border-slate-200 shadow-sm'}`}>
+                                                    <input type="radio" checked={activeQ.answer === oIdx} onChange={() => updateQuestion(selectedQIndex, 'answer', oIdx)} className="w-4 h-4 accent-emerald-500" />
+                                                    <input type="text" value={opt} onChange={e => {
+                                                       let nOpts = [...activeQ.options];
+                                                       nOpts[oIdx] = e.target.value;
+                                                       updateQuestion(selectedQIndex, 'options', nOpts);
+                                                    }} className="flex-1 bg-transparent border-none focus:outline-none text-[11px] font-bold text-slate-800" placeholder={`Option ${oIdx + 1}...`} />
+                                                    <button onClick={() => updateQuestion(selectedQIndex, 'options', activeQ.options.filter((_, idx)=>idx!==oIdx))} className="opacity-0 group-hover:opacity-100 p-1.5 text-slate-300 hover:text-red-500 transition-all"><Trash2 size={12}/></button>
+                                                 </div>
+                                             ))}
+                                          </div>
+                                       </div>
+
+                                       <div className="space-y-3">
+                                          <label className="text-[9px] font-black text-amber-600 uppercase tracking-widest block">Solution Reasoning</label>
+                                          <textarea rows="3" value={activeQ.solution || ''} onChange={e => updateQuestion(selectedQIndex, 'solution', e.target.value)} className="w-full p-4 border border-amber-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-200 font-mono text-xs text-amber-900 bg-amber-50/20" placeholder="Explain the logic..." />
+                                       </div>
+                                    </div>
+
+                                    <div className="flex-1 flex flex-col bg-slate-50/50 p-6 space-y-4 overflow-y-auto custom-scrollbar">
+                                       <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Live Learner Preview</label>
+                                       <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm grow flex flex-col min-h-0">
+                                          <div className="mb-6 flex-1 min-h-0">
+                                             <MarkdownPreviewBlock content={activeQ.description || ''} />
+                                          </div>
+                                          <div className="space-y-2">
+                                             {(activeQ.options || []).map((opt, oIdx) => (
+                                                <div key={oIdx} className={`p-4 rounded-xl border text-[13px] font-medium flex items-center gap-3 ${activeQ.answer === oIdx ? 'border-emerald-500 bg-emerald-50 text-emerald-800' : 'border-slate-100 bg-slate-50/30'}`}>
+                                                   <span className={`w-5 h-5 rounded-md flex items-center justify-center text-[9px] font-black uppercase ${activeQ.answer === oIdx ? 'bg-emerald-500 text-white' : 'bg-white border border-slate-200 text-slate-400'}`}>{String.fromCharCode(65 + oIdx)}</span>
+                                                   <MarkdownPreviewBlock content={opt} />
+                                                </div>
+                                             ))}
+                                          </div>
+                                       </div>
+                                    </div>
+                                 </div>
+                                 )}
+                              </div>
                            </div>
                         </div>
-                       ))}
-                       
-                       <button onClick={addQuestion} className="w-full py-3 border border-dashed border-slate-300 text-slate-400 text-xs font-black uppercase tracking-widest rounded-xl hover:bg-slate-50 hover:border-slate-400 hover:text-slate-600 transition-all flex items-center justify-center gap-2">
-                          <Plus className="w-4 h-4"/> Append Question
-                       </button>
-                    </div>
                     );
                   })()}
                </div>

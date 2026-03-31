@@ -1,15 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import useStore from '../../store/useStore';
 import { 
   Book, Clock, Calendar, FileText, Award, HelpCircle, 
-  User, Menu, LogOut 
+  User, Menu, LogOut, Database 
 } from 'lucide-react';
 
 export default function Layout() {
-  const { user, role, setRole, loading, isSidebarCollapsed, toggleSidebar, isEmbed } = useStore();
+  const { user, role, setRole, loading, isSidebarCollapsed, toggleSidebar, isEmbed, isLocalDraft, fetchData } = useStore();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const location = useLocation();
+
+  // Cross-Tab Sync Logic
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === 'lms_local_draft') {
+        console.log("🔄 Local draft sync triggered from another tab.");
+        fetchData();
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [fetchData]);
 
   if (loading) return null;
 
@@ -81,8 +93,15 @@ export default function Layout() {
                 <div className="w-10 h-10 bg-[#7A1B1E] rounded-full flex items-center justify-center text-white font-black text-lg shadow-inner group-hover:rotate-12 transition-transform shrink-0">
                   I
                 </div>
-                <span className="font-extrabold text-xl md:text-2xl text-slate-900 tracking-tight hidden lg:block uppercase">IIT Madras</span>
-                <span className="font-extrabold text-xl text-slate-900 tracking-tight lg:hidden uppercase">IITM</span>
+                <div className="flex flex-col">
+                  <span className="font-extrabold text-xl md:text-2xl text-slate-900 tracking-tight hidden lg:block uppercase">IIT Madras</span>
+                  <span className="font-extrabold text-xl text-slate-900 tracking-tight lg:hidden uppercase">IITM</span>
+                  {isLocalDraft && (
+                    <div className="flex items-center gap-1.5 text-[10px] font-black text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full border border-orange-100 uppercase tracking-tighter w-fit animate-pulse">
+                      <Database className="w-3 h-3" /> LOCAL DRAFT
+                    </div>
+                  )}
+                </div>
               </Link>
             </div>
             

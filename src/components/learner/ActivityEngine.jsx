@@ -1,21 +1,62 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import useStore from '../../store/useStore';
 import WhiteboardOverlay from '../shared/WhiteboardOverlay';
+import { marked } from 'marked';
+import DOMPurify from 'dompurify';
 import katex from 'katex';
+import 'katex/dist/katex.min.css';
+import hljs from 'highlight.js';
+import 'highlight.js/styles/atom-one-dark-reasonable.css';
 import { 
   PenTool, CheckCircle2, ChevronRight, ChevronLeft, Bookmark, 
   Trash, MousePointer2, Minus, Circle, Square, MoveRight, Eraser, Triangle, Activity, X 
 } from 'lucide-react';
 
-const renderMathText = (text) => {
-    let t = text;
-    t = t.replace(/\$\$([\s\S]+?)\$\$/g, (match, math) => {
-        try { return katex.renderToString(math, { displayMode: true, throwOnError: false }) } catch(e) { return math }
+const MarkdownRenderer = ({ content, className = "" }) => {
+  const contentRef = useRef(null);
+  
+  useEffect(() => {
+    if (!contentRef.current || !content) return;
+    
+    let text = content;
+    const mathBlocks = [];
+    text = text.replace(/\$\$(!?)([\s\S]+?)\$\$/g, (match, isImportant, math) => {
+        mathBlocks.push({ type: 'block', math, isImportant: !!isImportant });
+        return `%%%MATH_${mathBlocks.length - 1}%%%`;
     });
-    t = t.replace(/\$([^$\n]+?)\$/g, (match, math) => {
-        try { return katex.renderToString(math, { displayMode: false, throwOnError: false }) } catch(e) { return math }
+    text = text.replace(/\$([^$\n]+?)\$/g, (match, math) => {
+        mathBlocks.push({ type: 'inline', math, isImportant: false });
+        return `%%%MATH_${mathBlocks.length - 1}%%%`;
     });
-    return <span dangerouslySetInnerHTML={{ __html: t }} />;
+
+    try {
+        let html = marked.parse(text);
+        html = DOMPurify.sanitize(html);
+
+        mathBlocks.forEach((block, index) => {
+            try {
+                const rendered = katex.renderToString(block.math, {
+                    displayMode: block.type === 'block',
+                    throwOnError: false
+                });
+                let finalHtml = rendered;
+                if (block.isImportant) {
+                    finalHtml = `<div class="scale-[1.04] origin-center my-6 text-black drop-shadow-sm">${rendered}</div>`;
+                }
+                html = html.replace(`%%%MATH_${index}%%%`, finalHtml);
+            } catch (e) {
+                html = html.replace(`%%%MATH_${index}%%%`, block.math);
+            }
+        });
+
+        contentRef.current.innerHTML = html;
+        contentRef.current.querySelectorAll('pre code').forEach(block => hljs.highlightElement(block));
+    } catch (e) {
+        contentRef.current.innerHTML = '<span class="text-red-500">Error rendering content.</span>';
+    }
+  }, [content]);
+
+  return <div ref={contentRef} className={`prose prose-sm max-w-none prose-slate prose-headings:font-bold prose-headings:m-0 prose-p:m-0 prose-a:text-blue-600 prose-code:font-mono prose-code:text-[0.85em] prose-pre:bg-slate-800 prose-pre:text-slate-50 prose-pre:my-2 prose-pre:p-3 prose-pre:rounded-md wrap-break-word ${className}`}></div>;
 };
 
 export default function ActivityEngine({ item, course }) {
@@ -149,7 +190,7 @@ export default function ActivityEngine({ item, course }) {
                 {/* The text/options sit beneath it. If wbTool=pointer, clicks pass-through */}
                 <div className="select-none h-full w-full">
                   <h3 className="text-lg md:text-xl text-slate-900 font-semibold mb-5 leading-relaxed selection:bg-red-100 relative z-0">
-                     <LatexRenderer text={question.description || question.text} />
+                     <MarkdownRenderer content={question.description || question.text} />
                   </h3>
                   
                   {/* Responsive Question Image */}
@@ -190,8 +231,8 @@ export default function ActivityEngine({ item, course }) {
                                  <span className="text-[10px] font-black text-slate-400">{alphaLabel}</span>
                              )}
                         </div>
-                        <div className={`text-base font-semibold pt-[1px] ${isChecked ? 'text-[#7A1B1E]' : 'text-slate-700'}`}>
-                          <LatexRenderer text={opt} />
+                        <div className={`text-base font-semibold pt-px ${isChecked ? 'text-[#7A1B1E]' : 'text-slate-700'}`}>
+                          <MarkdownRenderer content={opt} />
                         </div>
                       </label>
                     )
@@ -355,8 +396,3 @@ export default function ActivityEngine({ item, course }) {
     </div>
   );
 }
-
-// Wrapper to prevent LateX crashing React Router directly.
-const LatexRenderer = ({text}) => {
-    return renderMathText(text);
-};

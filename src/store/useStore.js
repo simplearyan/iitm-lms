@@ -9,6 +9,7 @@ const useStore = create((set) => ({
   role: 'learner', 
   isSidebarCollapsed: false,
   isEmbed: false,
+  isLocalDraft: false,
   // Global Authoring Context
   currentYear: '2024',
   currentTerm: 'T1', // T1 (Jan-Apr), T2 (May-Aug), T3 (Sep-Dec)
@@ -17,8 +18,14 @@ const useStore = create((set) => ({
   toggleSidebar: () => set((state) => ({ isSidebarCollapsed: !state.isSidebarCollapsed })),
   setRole: (role) => set({ role }),
   setIsEmbed: (isEmbed) => set({ isEmbed }),
-  setYear: (year) => set({ currentYear: year }),
-  setTerm: (term) => set({ currentTerm: term }),
+  setYear: (year) => {
+    set({ currentYear: year });
+    useStore.getState().saveToLocal();
+  },
+  setTerm: (term) => {
+    set({ currentTerm: term });
+    useStore.getState().saveToLocal();
+  },
   
   // Semantic ID Generator Utility
   generateSemanticId: (courseCode, typePrefix, index, week) => {
@@ -52,11 +59,30 @@ const useStore = create((set) => ({
 
       const fullCourses = await Promise.all(coursePromises);
 
+      // --- HYDRATION LOGIC: Check Local Drafts ---
+      const localDraft = localStorage.getItem('lms_local_draft');
+      let finalCourses = fullCourses;
+      let finalQuestions = questionsData.questions || [];
+      let isDraft = false;
+
+      if (localDraft) {
+        try {
+          const draft = JSON.parse(localDraft);
+          finalCourses = draft.courses || fullCourses;
+          finalQuestions = draft.questions || finalQuestions;
+          isDraft = true;
+          console.log("🚀 Hydrated from local draft.");
+        } catch (e) {
+          console.error("Local draft corrupted:", e);
+        }
+      }
+
       set({ 
         user: manifest.user || null, 
-        courses: fullCourses, 
-        questions: questionsData.questions || [],
-        whiteboardData: {}, // Whiteboard data can follow a similar chunking strategy later if needed
+        courses: finalCourses, 
+        questions: finalQuestions,
+        isLocalDraft: isDraft,
+        whiteboardData: {}, 
         loading: false 
       });
     } catch (error) {
@@ -84,8 +110,57 @@ const useStore = create((set) => ({
     }
   })),
 
-  // Instructor Action: Update Courses list
-  setCourses: (courses) => set({ courses }),
+  setCourses: (courses) => {
+    // Sync any inline questions with the global question bank if IDs match
+    const { questions } = useStore.getState();
+    let updatedGlobalBank = [...questions];
+    let syncCount = 0;
+
+    courses.forEach(course => {
+      course.modules?.forEach(module => {
+        module.items?.forEach(item => {
+          if (['activity', 'quiz', 'assignment'].includes(item.type) && item.questions) {
+            item.questions.forEach(q => {
+               const gIdx = updatedGlobalBank.findIndex(gq => gq.id === q.id);
+               if (gIdx !== -1) {
+                  updatedGlobalBank[gIdx] = { ...updatedGlobalBank[gIdx], ...q };
+                  syncCount++;
+               }
+            });
+          }
+        });
+      });
+    });
+
+    if (syncCount > 0) {
+       console.log(`Synced ${syncCount} questions to Master Bank.`);
+       set({ courses, questions: updatedGlobalBank, isLocalDraft: true });
+    } else {
+       set({ courses, isLocalDraft: true });
+    }
+    
+    useStore.getState().saveToLocal();
+  },
+
+  updateGlobalQuestion: (updatedQ) => {
+    const { questions } = useStore.getState();
+    const newQs = questions.map(q => q.id === updatedQ.id ? { ...q, ...updatedQ } : q);
+    set({ questions: newQs, isLocalDraft: true });
+    useStore.getState().saveToLocal();
+  },
+
+  // Persistence Helpers
+  saveToLocal: () => {
+    const { courses, questions } = useStore.getState();
+    localStorage.setItem('lms_local_draft', JSON.stringify({ courses, questions }));
+  },
+
+  resetToRemote: async () => {
+    if (!window.confirm("Discard all local edits and reset to server version?")) return;
+    localStorage.removeItem('lms_local_draft');
+    await useStore.getState().fetchData();
+    window.location.reload(); // Hard reset for consistency
+  },
 
   // Instructor Action: Export Configuration
   exportData: () => {
