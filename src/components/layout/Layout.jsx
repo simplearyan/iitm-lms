@@ -18,7 +18,7 @@ export default function Layout() {
       
       {/* Global Minimal Sidebar (Desktop) */}
       {!isEmbed && (
-        <aside className="hidden md:flex w-[72px] bg-[#1a1b1e] flex-col items-center py-6 gap-8 shrink-0 z-40 shadow-xl border-r border-[#2c2e33]">
+        <aside className="hidden md:flex w-[72px] bg-[#1a1b1e] flex-col items-center py-6 gap-8 shrink-0 z-50 shadow-xl border-r border-[#2c2e33]">
           <button onClick={toggleSidebar} className={`p-2 hover:bg-white/10 rounded-xl transition-all ${isSidebarCollapsed ? 'text-white bg-white/10' : 'text-slate-400'}`} title={isSidebarCollapsed ? 'Expand Syllabus' : 'Collapse Syllabus'}>
             <Menu size={28} strokeWidth={2.5} />
           </button>
@@ -39,7 +39,7 @@ export default function Layout() {
 
       {/* Mobile Navigation Overlay */}
       {isMobileNavOpen && (
-        <div className="md:hidden fixed inset-0 bg-black/60 z-50 backdrop-blur-sm" onClick={() => setIsMobileNavOpen(false)}>
+        <div className="md:hidden fixed inset-0 bg-black/60 z-[100] backdrop-blur-sm" onClick={() => setIsMobileNavOpen(false)}>
           <div className="w-[80px] bg-[#1a1b1e] h-full flex flex-col items-center py-8 gap-8 shadow-2xl border-r border-[#2c2e33] animate-in slide-in-from-left-full" onClick={e => e.stopPropagation()}>
             <Link to="/" onClick={() => setIsMobileNavOpen(false)} className={`p-3.5 rounded-2xl transition-all ${location.pathname === '/' || location.pathname === '/instructor' ? 'bg-white/15 text-white shadow-sm' : 'text-slate-500 hover:text-white hover:bg-white/10'}`} title="Dashboard">
               <Book size={28} strokeWidth={2.5} />
@@ -60,10 +60,20 @@ export default function Layout() {
         
         {/* Top Navbar */}
         {!isEmbed && (
-          <nav className="h-[72px] bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-8 shrink-0 z-30 shadow-[0_1px_4px_rgba(0,0,0,0.02)] relative">
+          <nav className="h-[72px] bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-8 shrink-0 z-40 shadow-[0_1px_4px_rgba(0,0,0,0.02)] relative">
             
             <div className="flex items-center gap-4">
-              <button className="md:hidden text-slate-600 p-2 hover:bg-slate-100 rounded-lg transition-colors" onClick={() => setIsMobileNavOpen(true)}>
+              {/* Universal Hamburger: Toggles Mobile Nav on Mobile, Toggles Syllabus on Desktop */}
+              <button 
+                className="text-slate-600 p-2 hover:bg-slate-100 rounded-lg transition-colors" 
+                onClick={() => {
+                  if (window.innerWidth < 768) {
+                    setIsMobileNavOpen(true);
+                  } else {
+                    toggleSidebar();
+                  }
+                }}
+              >
                 <Menu size={24} strokeWidth={2.5} />
               </button>
               

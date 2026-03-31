@@ -75,15 +75,16 @@ export default function CourseViewer() {
       {/* Course Sidebar (Desktop) / Drawer (Mobile) */}
       {!isEmbed && (
         <aside className={`
-          fixed inset-0 z-40 bg-black/40 backdrop-blur-sm md:relative md:bg-transparent md:backdrop-blur-none
+          fixed inset-0 z-[200] bg-black/40 backdrop-blur-sm md:relative md:bg-transparent md:backdrop-blur-none
           transition-all duration-300 ease-in-out
           ${isMobileSyllabusOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none md:opacity-100 md:pointer-events-auto'}
+          ${isSidebarCollapsed ? 'md:w-0' : 'md:w-80'}
         `} onClick={() => setIsMobileSyllabusOpen(false)}>
           <div className={`
-            flex flex-col border-r border-slate-200 bg-white shrink-0 h-full w-[85%] max-w-[320px] md:w-80 
-            transition-transform duration-300 ease-in-out transform
+            flex flex-col border-r border-slate-200 bg-white shrink-0 h-full w-[85%] max-w-[320px] 
+            transition-all duration-300 ease-in-out transform
             ${isMobileSyllabusOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
-            ${isSidebarCollapsed ? 'md:w-0 md:-translate-x-full' : ''}
+            ${isSidebarCollapsed ? 'md:w-0 md:opacity-0 md:pointer-events-none' : 'md:w-80 md:opacity-100'}
           `} onClick={e => e.stopPropagation()}>
           {/* Header */}
           <div className="p-4 md:p-6 border-b border-slate-200 shrink-0 bg-white">
@@ -143,7 +144,7 @@ export default function CourseViewer() {
         
         {/* Mobile Toolbar (Visible only on small screens) */}
         {!isEmbed && (
-          <div className="md:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-slate-100 shrink-0 z-20">
+          <div className="md:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-slate-100 shrink-0 z-[70]">
             <button 
               onClick={() => setIsMobileSyllabusOpen(true)}
               className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200"
@@ -162,7 +163,7 @@ export default function CourseViewer() {
             Select a learning item to begin.
           </div>
         ) : (
-          <div className={`flex-1 relative flex flex-col bg-slate-50 ${(activeItem.type === 'activity' || activeItem.type === 'video') ? 'overflow-hidden' : 'overflow-y-auto'}`}>
+          <div key={activeItem.id} className={`flex-1 relative flex flex-col bg-slate-50 ${(activeItem.type === 'activity' || activeItem.type === 'video') ? 'overflow-hidden' : 'overflow-y-auto'}`}>
             
             {/* Universal Actions Bar (Floating/Fixed at top right) */}
             {!isEmbed && (
@@ -220,7 +221,7 @@ export default function CourseViewer() {
 
       {/* Embed Code Modal */}
       {showEmbedModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[500] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200 border border-slate-200">
             <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
               <h3 className="font-black text-slate-900 tracking-tight">Embed This Note</h3>

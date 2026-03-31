@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import useStore from '../../store/useStore';
 import WhiteboardOverlay from '../shared/WhiteboardOverlay';
 import katex from 'katex';
@@ -21,9 +21,11 @@ const renderMathText = (text) => {
 export default function ActivityEngine({ item, course }) {
   const { activityProgress, setActivityProgress, updateWhiteboardData } = useStore();
   
-  // Convert old scrolling view logic to paginated Mock Exam logic
-  // Support both embedded questions and legacy global question lookups
-  const questions = item.questions || item.questionIds?.map(id => course.questions?.find(q => q.id === id)).filter(Boolean) || [];
+  // Use useMemo to ensure questions are consistent and reset correctly when item changes
+  const questions = useMemo(() => {
+    return item.questions || item.questionIds?.map(id => course.questions?.find(q => q.id === id)).filter(Boolean) || [];
+  }, [item, course]);
+  
   const [currentQIndex, setCurrentQIndex] = useState(0);
 
   // New states for the activity (like marked for review, tracking visits)
@@ -88,7 +90,7 @@ export default function ActivityEngine({ item, course }) {
   const notVisitedCount = questions.length - visitedCount;
 
   return (
-    <div className="w-full h-full flex flex-col animate-fade-in relative bg-slate-50 overflow-hidden">
+    <div key={item.id} className="w-full h-full flex flex-col animate-fade-in relative bg-slate-50 overflow-hidden">
       
       {/* Mobile Floating Palette Trigger */}
       <button 
@@ -101,7 +103,7 @@ export default function ActivityEngine({ item, course }) {
       <div className="flex flex-col md:flex-row gap-4 md:gap-6 flex-1 h-full p-2 md:p-4 lg:p-6 overflow-hidden">
           
           {/* Main Question Column */}
-          <div className="flex-1 flex flex-col bg-white overflow-hidden shadow-sm border border-slate-200 rounded-2xl relative min-h-[400px] select-none">
+          <div className="flex-1 flex flex-col bg-white overflow-hidden shadow-sm border border-slate-200 rounded-2xl relative min-h-[400px]">
              
              {/* Header */}
              <div className="bg-slate-50 border-b border-slate-200 px-6 py-4 flex justify-between items-center shrink-0">
@@ -126,11 +128,19 @@ export default function ActivityEngine({ item, course }) {
                 />
 
                 {/* The text/options sit beneath it. If wbTool=pointer, clicks pass-through */}
-                <h3 className="text-lg md:text-xl text-slate-900 font-semibold mb-8 leading-relaxed selection:bg-red-100 relative z-0">
-                   <LatexRenderer text={question.description || question.text} />
-                </h3>
-                
-                <div className="space-y-4 max-w-3xl relative z-0">
+                <div className="select-none h-full w-full">
+                  <h3 className="text-lg md:text-xl text-slate-900 font-semibold mb-8 leading-relaxed selection:bg-red-100 relative z-0">
+                     <LatexRenderer text={question.description || question.text} />
+                  </h3>
+                  
+                  {/* Responsive Question Image */}
+                  {question.image && (
+                    <div className="mb-10 max-w-2xl bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm relative z-0">
+                      <img src={question.image} alt="Question Visual" className="w-full h-auto object-contain bg-slate-50 p-4" />
+                    </div>
+                  )}
+                  
+                  <div className="space-y-4 max-w-3xl relative z-0">
                   {question.options?.map((opt, oIdx) => {
                     const ans = activityProgress[question.id];
                     const isChecked = ans === oIdx || (Array.isArray(ans) && ans.includes(oIdx));
@@ -169,7 +179,8 @@ export default function ActivityEngine({ item, course }) {
                     )
                   })}
                 </div>
-             </div>
+              </div>
+            </div>
 
              {/* Integrated Drawing Toolbar matching the Mock */}
              <div className="border-t border-slate-200 shrink-0 bg-slate-50 p-3 md:px-6 md:py-4 flex flex-col lg:flex-row justify-between items-center gap-3 md:gap-4 z-30">
