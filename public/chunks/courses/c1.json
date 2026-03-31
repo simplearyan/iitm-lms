@@ -1,0 +1,72 @@
+{
+  "id": "c1",
+  "modules": [
+    {
+      "id": "m1", 
+      "title": "Week 1: Joint Distributions", 
+      "items": [
+        { 
+          "id": "i1", 
+          "type": "video", 
+          "title": "L1.1: Joint PMF of two discrete random variables", 
+          "url": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+          "notes": "### Important Concepts\n\nThe Joint PMF $P(X=x, Y=y)$ must satisfy the following conditions:\n1. $0 \\le P(x,y) \\le 1$\n2. $\\sum_x \\sum_y P(x,y) = 1$\n\n> Note: Watch the video carefully to understand how to build the joint distribution table.\n\nHere is an inline code example: `P(X=1, Y=2) = 0.25`."
+        },
+        { 
+          "id": "i2", 
+          "type": "note", 
+          "title": "Reading: Marginal PMFs & Expectations",
+          "content": "## Introduction to Marginal Distributions\n\nWhen dealing with two discrete random variables, $X$ and $Y$, their joint behavior is described by the Joint Probability Mass Function (PMF), $P_{X,Y}(x,y)$. However, there are times when we want to isolate and understand the behavior of just one of these variables, ignoring the other. This isolated distribution is known as the **Marginal PMF**.\n\n## 1) Finding the Marginal Distribution\n\nTo find the marginal PMF of $X$, you must sum the joint probabilities over all possible values of $Y$. This process mathematically \"marginalizes out\" the variable $Y$.\n\n$$!P_X(x) = \\sum_{y \\in S_Y} P_{X,Y}(x,y)$$\n\nSimilarly, the marginal PMF of $Y$ is found by summing over all possible values of $X$:\n\n$$P_Y(y) = \\sum_{x \\in S_X} P_{X,Y}(x,y)$$\n\n### Step-by-Step Explanation\nHere is how you actually calculate the marginal PMF from a joint distribution table:\n\n1. **Identify the target variable:** Decide whether you are calculating the marginal PMF for $X$ (rows) or $Y$ (columns).\n2. **Locate the probability values:** Find the specific value of the target random variable you want to isolate (e.g., $X = 1$).\n3. **Summation:** Add together all intersection probabilities associated with your target value across the *other* dimension. For example, to find $P(X=1)$, sum all joint probabilities across row $X=1$.\n4. **Repeat:** Do this for every possible value defined in your variable's sample space.\n5. **Validation:** Verify that the sum of all your newly calculated marginal probabilities exactly equals 1."
+        },
+        { 
+          "id": "i3", 
+          "type": "activity", 
+          "title": "AQ1.1: Activity Question 1 - Not Graded",
+          "questionIds": ["aq1_q1"]
+        },
+        { 
+          "id": "i3.1", 
+          "type": "activity", 
+          "title": "Practice: Joint Distributions",
+          "questionIds": ["q1", "q2"]
+        },
+        {
+          "id": "i4",
+          "type": "quiz",
+          "title": "Mock Practice: Discrete Probability Spaces",
+          "examType": "Mock Practice",
+          "duration": 15,
+          "totalMarks": 15,
+          "submissionRule": "anytime",
+          "questionIds": ["mp_q1", "py_q1", "py_q2"]
+        },
+        {
+          "id": "i5",
+          "type": "quiz",
+          "title": "Quiz 1: Joint & Marginal Distributions",
+          "examType": "Quiz",
+          "duration": 30,
+          "totalMarks": 20,
+          "submissionRule": "auto_only",
+          "questionIds": ["qz1_q1", "ma_q1"]
+        },
+        {
+          "id": "i6",
+          "type": "quiz",
+          "title": "Midterm Exam 2026: Statistics II",
+          "examType": "Term Exam",
+          "duration": 120,
+          "totalMarks": 100,
+          "submissionRule": "last_10_mins",
+          "questionIds": ["mt_q1", "ct_q1"]
+        },
+        {
+          "id": "i7",
+          "type": "assignment",
+          "title": "Graded Assignment 1.1: Expectations",
+          "questionIds": ["ga_q1"]
+        }
+      ]
+    }
+  ]
+}

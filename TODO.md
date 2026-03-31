@@ -14,9 +14,11 @@ This file tracks technical debt and performance optimization goals to make the L
     - [ ] Move `marked` and `dompurify` logic into a Web Worker to prevent UI jank during long notes.
 
 ## 🏛️ Content Management & AI-Readiness
-- [ ] **Distributed Content Architecture (Manifest-Chunk Pattern)**
-    - [ ] Create `/content/manifest.json` for global navigation.
-    - [ ] Move large lesson notes/activity banks into individual per-course JSON files to optimize load times.
+- [x] Decommission `data.json`
+- [x] Verification
+    - [x] Network tab check: manifest + chunks loading
+    - [x] Full navigation test through all courses
+    - [x] Dynamic user name binding (ARYAN)
 - [ ] **AI-Ready Metadata Integration**
     - [ ] Enforce a schema for new questions that includes `ai_metadata` (topic, difficulty, concept).
     - [ ] Create a "Dataset Exporter" script to generate JSONL files for RAG fine-tuning.

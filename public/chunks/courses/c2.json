@@ -1,0 +1,36 @@
+{
+  "id": "c2",
+  "modules": [
+    {
+      "id": "m1",
+      "title": "Course Introduction",
+      "items": [
+        {
+          "id": "i1",
+          "type": "note",
+          "title": "About the Course",
+          "content": "# Mathematics for Data Science II\n\n**Course ID:** BSMA1003\n**Course Credits:** 4\n**Course Type:** Foundational\n\n### Faculty:\n**Dr. Sarang S Sane**\nAssistant Professor, Department of Mathematics, IIT Madras\n\n### Prescribed Books:\n1. **Mathematics for Machine Learning** by Marc Peter Deisenroth.\n2. **Vector Calculus** by Michael Corral."
+        }
+      ]
+    },
+    {
+      "id": "m2",
+      "title": "Week 1: Vectors & Matrices",
+      "items": [
+        {
+          "id": "i2",
+          "type": "video",
+          "title": "L1.1: Vectors",
+          "url": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+          "notes": "Introduction to vectors in $\\mathbb{R}^2$ and $\\mathbb{R}^3$. Discussing magnitude and direction."
+        },
+        {
+          "id": "i3",
+          "type": "activity",
+          "title": "AQ1.1: Activity Questions 1 - Not Graded",
+          "questionIds": ["m2_q1"]
+        }
+      ]
+    }
+  ]
+}

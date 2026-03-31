@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 
 export default function Layout() {
-  const { role, setRole, loading, isSidebarCollapsed, toggleSidebar, isEmbed } = useStore();
+  const { user, role, setRole, loading, isSidebarCollapsed, toggleSidebar, isEmbed } = useStore();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const location = useLocation();
 
@@ -107,7 +107,7 @@ export default function Layout() {
   
               {/* Profile Tools (Desktop/Large Only) */}
               <div className="hidden xl:flex items-center gap-3 text-slate-700 font-bold text-sm bg-slate-50 border border-slate-200 px-4 py-2 rounded-xl">
-                <span className="uppercase tracking-widest text-[#7A1B1E]">Student Demo</span>
+                <span className="uppercase tracking-widest text-[#7A1B1E]">{user?.name || 'Student Demo'}</span>
                 <User size={18} className="text-slate-400" />
               </div>
               

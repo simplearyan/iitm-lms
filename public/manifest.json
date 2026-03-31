@@ -1,0 +1,24 @@
+{
+  "user": {
+    "name": "ARYAN",
+    "cgpa": "7.0",
+    "term": "JANUARY 2026 TERM",
+    "date": "28 March, 2026"
+  },
+  "courses": [
+    {
+      "id": "c1",
+      "title": "Statistics for Data Science II",
+      "code": "STATS20",
+      "type": "REPEAT FULL COURSE",
+      "chunk": "/chunks/courses/c1.json"
+    },
+    {
+      "id": "c2",
+      "title": "Mathematics II",
+      "code": "MA1202",
+      "type": "FOUNDATIONAL",
+      "chunk": "/chunks/courses/c2.json"
+    }
+  ]
+}

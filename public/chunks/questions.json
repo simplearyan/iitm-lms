@@ -1,0 +1,116 @@
+{
+  "questions": [
+    { 
+      "id": "q1", 
+      "text": "1) An experiment consists of rolling an unbiased die two times. The random variables $X_i \\sim \\text{Uniform}\\{1, 2, 3, 4, 5, 6\\}$, represent the number on the $i$-th roll, $i = 1, 2$. Calculate $f_{X_1,X_2}(3, 2)$.", 
+      "type": "radio", 
+      "options": ["$\\frac{1}{6}$", "$\\frac{1}{12}$", "$\\frac{1}{36}$", "$\\frac{1}{18}$"], 
+      "answer": 2,
+      "solution": "Since the rolls are independent, the joint probability is the product of the marginals: $\\frac{1}{6} \\times \\frac{1}{6} = \\frac{1}{36}$",
+      "points": 1,
+      "ai_metadata": { "topic": "Probability", "concept": "Joint Distributions", "difficulty": "Easy", "skills": ["Independence"] }
+    },
+    { 
+      "id": "q2", 
+      "text": "2) The joint probability mass function of two discrete random variables $X$ and $Y$ is given. Which of the following are possible values of $a$ and $b$?", 
+      "type": "checkbox", 
+      "options": ["$a = \\frac{1}{2}, b = 0$", "$a = \\frac{1}{4}, b = \\frac{1}{2}$", "$a = 1, b = 1$", "$a = \\frac{1}{8}, b = \\frac{3}{8}$"], 
+      "answer": [0],
+      "solution": "The sum of all probabilities must be equal to 1.",
+      "points": 1,
+      "ai_metadata": { "topic": "Probability", "concept": "Normalization Condition", "difficulty": "Medium", "skills": ["Constraints"] }
+    },
+    {
+      "id": "aq1_q1",
+      "text": "If $X$ and $Y$ are independent random variables, what is $E[XY]$?",
+      "options": ["$E[X] + E[Y]$ text-slate-800", "$E[X]E[Y]$ text-slate-800", "$E[X]/E[Y]$ text-slate-800", "$0$ text-slate-800"],
+      "answer": 1,
+      "solution": "By independence, the expectation of the product is the product of the expectations.",
+      "ai_metadata": { "topic": "Statistics", "concept": "Independent Expectations", "difficulty": "Easy", "skills": ["Theory"] }
+    },
+    {
+      "id": "mp_q1",
+      "text": "Suppose $X \\sim \\text{Poisson}(\\lambda)$. What is $P(X=0)$?",
+      "options": ["$e^{-\\lambda}$", "$\\lambda e^{-\\lambda}$", "$1 - e^{-\\lambda}$", "$0$"],
+      "answer": 0,
+      "solution": "The Poisson PMF is $P(X=k) = \\frac{\\lambda^k e^{-\\lambda}}{k!}$. For $k=0$, $P(X=0) = \\frac{\\lambda^0 e^{-\\lambda}}{0!} = e^{-\\lambda}$.",
+      "ai_metadata": { "topic": "Probability", "concept": "Poisson Process", "difficulty": "Easy", "skills": ["Formula Manipulation"] }
+    },
+    {
+      "id": "py_q1",
+      "text": "Which of the following is an immutable data type in Python?",
+      "options": ["List", "Dictionary", "Set", "Tuple"],
+      "answer": 3,
+      "solution": "In Python, Tuples are immutable, meaning their elements cannot be changed after they are created. Lists, Dictionaries, and Sets are mutable.",
+      "ai_metadata": { "topic": "Computer Science", "concept": "Data Types", "difficulty": "Easy", "skills": ["Python Syntax"] }
+    },
+    {
+      "id": "py_q2",
+      "text": "What is the output of `print(2 ** 3 ** 2)`?",
+      "options": ["64", "512", "4096", "None of the above"],
+      "answer": 1,
+      "solution": "Exponentiation `**` is evaluated from right to left in Python. So, `2 ** 3 ** 2` is evaluated as `2 ** (3 ** 2)` -> `2 ** 9` -> `512`.",
+      "ai_metadata": { "topic": "Computer Science", "concept": "Operator Precedence", "difficulty": "Medium", "skills": ["Algorithmic Logic"] }
+    },
+    {
+      "id": "qz1_q1",
+      "text": "Consider the joint PMF $f(x,y)=k(x+y)$ for $x,y \\in \\{1,2\\}$. Find the value of $k$.",
+      "options": ["$1/12$", "$1/15$", "$1/18$", "$1/20$"],
+      "answer": 0,
+      "solution": "Summing probabilities: $k(1+1) + k(1+2) + k(2+1) + k(2+2) = k(2+3+3+4) = 12k = 1 \\Rightarrow k = 1/12$.",
+      "ai_metadata": { "topic": "Calculus/Prob", "concept": "Normalization Constant", "difficulty": "Medium", "skills": ["Summation"] }
+    },
+    {
+      "id": "ma_q1",
+      "text": "What is the derivative of $f(x) = e^x$?",
+      "options": ["$x \\cdot e^{x-1}$", "$e^x$", "$\\ln(x)$", "$\\frac{1}{x}$"],
+      "answer": 1,
+      "solution": "The exponential function $e^x$ is unique because its derivative is exactly itself. Therefore, $\\frac{d}{dx} e^x = e^x$.",
+      "ai_metadata": { "topic": "Calculus", "concept": "Differentiation", "difficulty": "Easy", "skills": ["Core Functions"] }
+    },
+    {
+      "id": "mt_q1",
+      "text": "Evaluate the limit: $$\\lim_{x \\to 0} \\frac{\\sin(x)}{x}$$",
+      "options": ["$0$", "$1$", "$\\infty$", "Undefined"],
+      "answer": 1,
+      "solution": "This is a fundamental trigonometric limit. As $x$ approaches $0$, the value of $\\frac{\\sin(x)}{x}$ approaches $1$.",
+      "ai_metadata": { "topic": "Calculus", "concept": "Limits", "difficulty": "Medium", "skills": ["Trigonometry"] }
+    },
+    {
+      "id": "ct_q1",
+      "text": "Which of these is NOT a pillar of computational thinking?",
+      "options": ["Decomposition", "Pattern Recognition", "Memorization", "Abstraction"],
+      "answer": 2,
+      "solution": "The 4 pillars of computational thinking are Decomposition, Pattern Recognition, Abstraction, and Algorithmic Thinking. Memorization is not one of them.",
+      "ai_metadata": { "topic": "Computer Science", "concept": "Computational Thinking", "difficulty": "Easy", "skills": ["Problem Solving"] }
+    },
+    {
+      "id": "ga_q1",
+      "text": "Calculate $E[X^2]$ if $X \\sim \\text{Bernoulli}(p)$.",
+      "options": ["$p^2$", "$p$", "$1-p$", "$2p$"],
+      "answer": 1,
+      "solution": "$E[X^2] = 1^2 \\cdot p + 0^2 \\cdot (1-p) = p$. Note that for Bernoulli, $E[X^k] = p$ for all $k \\ge 1$.",
+      "ai_metadata": { "topic": "Probability", "concept": "Expectation", "difficulty": "Easy", "skills": ["Moments"] }
+    },
+    {
+      "id": "m2_q1",
+      "text": "1) Choose the set of correct options using Figure M2W1AQ1. Let $A = (1, 2)$ and $B = (2, 3)$. Which of the following are true?",
+      "type": "checkbox",
+      "image": "/m2_w1_aq1.png",
+      "options": [
+        "$2A$ is the vector $(2, 4)$",
+        "$3B$ is the vector $(6, 9)$",
+        "$A + B$ is the vector $(3, 5)$",
+        "$A - B$ is the vector $(-1, -1)$"
+      ],
+      "answer": [0, 1, 2, 3],
+      "ai_metadata": {
+        "topic": "Vectors",
+        "concept": "Scalar Multiplication and Vector Addition",
+        "difficulty": "Easy",
+        "skills": ["Coordinate Interpretation", "Linear Algebra"]
+      },
+      "solution": "Vector addition and scalar multiplication are done coordinate-wise. $2(1, 2) = (2, 4)$, $3(2, 3) = (6, 9)$, $(1, 2) + (2, 3) = (3, 5)$, and $(1, 2) - (2, 3) = (-1, -1)$."
+    }
+  ]
+}

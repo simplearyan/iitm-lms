@@ -181,14 +181,13 @@ export default function CourseViewer() {
 
             {/* Context Header (Visible for Quiz/Term Exam/Assignments) */}
             {activeItem.type !== 'activity' && activeItem.type !== 'video' && activeItem.type !== 'note' && (
-              <div className="m-6 md:m-14 mb-8 border-b pb-6 border-slate-100 pr-16 md:pr-32">
-                 <div className="text-xs font-bold tracking-widest text-slate-400 uppercase mb-3 flex items-center gap-2">
+              <div className="m-4 md:m-8 mb-4 border-b pb-4 border-slate-100 pr-12 md:pr-24">
+                 <div className="text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-2 flex items-center gap-2">
                    <span>{currentModule?.title}</span>
                    <span className="w-1 h-1 rounded-full bg-slate-300"></span>
                    <span className={activeItem.type === 'activity' ? 'text-orange-500' : (activeItem.type === 'video' ? 'text-blue-500' : 'text-emerald-500')}>{activeItem.type}</span>
                  </div>
-                 
-                 <h1 className="text-2xl md:text-4xl font-black text-slate-900 tracking-tight leading-tight">{activeItem.title}</h1>
+                 <h1 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight leading-tight">{activeItem.title}</h1>
               </div>
             )}
 

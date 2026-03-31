@@ -19,12 +19,17 @@ const renderMathText = (text) => {
 };
 
 export default function ActivityEngine({ item, course }) {
-  const { activityProgress, setActivityProgress, updateWhiteboardData } = useStore();
+  const { questions: globalQuestions, activityProgress, setActivityProgress, updateWhiteboardData } = useStore();
   
   // Use useMemo to ensure questions are consistent and reset correctly when item changes
   const questions = useMemo(() => {
-    return item.questions || item.questionIds?.map(id => course.questions?.find(q => q.id === id)).filter(Boolean) || [];
-  }, [item, course]);
+    // Priority: 1. Inline questions (legacy/specific) 2. Global library lookup
+    if (item.questions && item.questions.length > 0) return item.questions;
+    if (item.questionIds) {
+      return item.questionIds.map(id => globalQuestions.find(q => q.id === id)).filter(Boolean);
+    }
+    return [];
+  }, [item, globalQuestions]);
   
   const [currentQIndex, setCurrentQIndex] = useState(0);
 
@@ -105,15 +110,29 @@ export default function ActivityEngine({ item, course }) {
           {/* Main Question Column */}
           <div className="flex-1 flex flex-col bg-white overflow-hidden shadow-sm border border-slate-200 rounded-2xl relative min-h-[400px]">
              
-             {/* Header */}
-             <div className="bg-slate-50 border-b border-slate-200 px-6 py-4 flex justify-between items-center shrink-0">
-               <span className="font-extrabold text-lg text-slate-800">Question {currentQIndex + 1}</span>
-               <div className="flex items-center space-x-3 text-sm">
-                   <span className="text-slate-500 font-bold uppercase tracking-widest text-xs bg-slate-200/50 px-2 py-1 rounded">
-                     {item.examType || (item.type === 'assignment' ? 'Graded Assignment' : 'Mock Exam Format')}
-                   </span>
-               </div>
-             </div>
+              {/* Header */}
+              <div className="bg-slate-50 border-b border-slate-200 px-6 py-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 shrink-0">
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-3">
+                    <h4 className="text-sm font-black text-slate-800 uppercase tracking-tighter">Question {currentQIndex + 1}</h4>
+                    {question?.ai_metadata?.topic && (
+                      <span className="px-2 py-0.5 bg-indigo-50 text-indigo-600 text-[10px] font-black rounded-full border border-indigo-100 uppercase tracking-widest">
+                        {question.ai_metadata.topic}
+                      </span>
+                    )}
+                  </div>
+                  {question?.ai_metadata?.concept && (
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">Concept: {question.ai_metadata.concept}</p>
+                  )}
+                </div>
+                <div className="flex items-center gap-4">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest hidden sm:inline">{item.examType || 'Practice Mode'}</span>
+                  <div className="flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 rounded-lg shadow-sm">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span className="text-[10px] font-black text-slate-600 uppercase tracking-tighter">LIVE CANVAS</span>
+                  </div>
+                </div>
+              </div>
 
              {/* Dynamic Question Canvas Layer */}
              <div className="flex-1 relative overflow-y-auto p-6 md:p-8">
@@ -129,7 +148,7 @@ export default function ActivityEngine({ item, course }) {
 
                 {/* The text/options sit beneath it. If wbTool=pointer, clicks pass-through */}
                 <div className="select-none h-full w-full">
-                  <h3 className="text-lg md:text-xl text-slate-900 font-semibold mb-8 leading-relaxed selection:bg-red-100 relative z-0">
+                  <h3 className="text-lg md:text-xl text-slate-900 font-semibold mb-5 leading-relaxed selection:bg-red-100 relative z-0">
                      <LatexRenderer text={question.description || question.text} />
                   </h3>
                   
@@ -149,10 +168,6 @@ export default function ActivityEngine({ item, course }) {
                     const labelClass = isChecked 
                        ? 'border-2 border-[#7A1B1E] bg-red-50 text-[#7A1B1E]' 
                        : 'border border-slate-300 hover:bg-slate-50 text-slate-800';
-                    
-                    const circleClass = isChecked 
-                       ? 'border-[#7A1B1E] bg-[#7A1B1E]' 
-                       : 'border-slate-300 bg-white';
 
                     return (
                       <label 
@@ -165,9 +180,12 @@ export default function ActivityEngine({ item, course }) {
                           checked={isChecked}
                           onChange={() => handleOptionSelect(oIdx)}
                         />
-                        <div className={`mt-0.5 w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 mr-4 shadow-sm transition-colors ${circleClass}`}>
+                        <div className={`
+                          w-6 h-6 rounded-lg border flex items-center justify-center shrink-0 text-xs font-bold transition-all pt-px mr-4
+                          ${isChecked ? 'bg-indigo-600 border-indigo-600 text-white shadow-md' : 'bg-white border-slate-200 text-slate-400 group-hover:border-slate-300'}
+                        `}>
                              {isChecked ? (
-                                 <div className="w-2.5 h-2.5 rounded-full bg-white"></div>
+                                 <CheckCircle2 className="w-4 h-4" />
                              ) : (
                                  <span className="text-[10px] font-black text-slate-400">{alphaLabel}</span>
                              )}
