@@ -185,7 +185,7 @@ export default function ActivityEngine({ item, course }) {
                    
                    {question.image && (
                      <div className="mb-12 max-w-full bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm relative z-0">
-                       <img src={question.image} alt="Context" className="w-full h-auto object-contain bg-slate-50 p-6 mx-auto max-h-[500px]" />
+                       <img src={(import.meta.env.BASE_URL || '/') + (question.image ? question.image.replace(/^\//, '') : '')} alt="Context" className="w-full h-auto object-contain bg-slate-50 p-6 mx-auto max-h-[500px]" />
                      </div>
                    )}
                    
