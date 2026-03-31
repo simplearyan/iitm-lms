@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import useStore from '../../store/useStore';
 import { useParams, Link } from 'react-router-dom';
-import { ChevronLeft, Plus, GripVertical, Video, FileText, CheckCircle2, Navigation, Trash2, Settings, Download, X, Edit3, Save, ClipboardList, Clock } from 'lucide-react';
+import { ChevronLeft, Plus, GripVertical, Video, FileText, CheckCircle2, Navigation, Trash2, Settings, Download, X, Edit3, Save, ClipboardList, Clock, Activity, Eye } from 'lucide-react';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import katex from 'katex';
@@ -79,7 +79,8 @@ export default function SyllabusBuilder() {
   const [activeModuleId, setActiveModuleId] = useState(course?.modules?.[0]?.id);
   const [editingItemId, setEditingItemId] = useState(null);
   const [selectedQIndex, setSelectedQIndex] = useState(0); 
-  const [importQId, setImportQId] = useState(''); // New: Import Query
+  const [importQId, setImportQId] = useState(''); 
+  const [activeTab, setActiveTab] = useState('editor'); // New: Mobile Tabs (nav, editor, preview)
 
   if (!course) return <div className="p-10 text-center font-bold text-slate-500">Course not found</div>;
 
@@ -492,10 +493,27 @@ export default function SyllabusBuilder() {
                     const activeQ = safeQuestions[selectedQIndex] || safeQuestions[0] || {};
 
                     return (
-                        <div className="flex flex-col h-[65vh] -mx-6 -mt-3">
+                        <div className="flex flex-col h-[70vh] md:h-[65vh] -mx-6 -mt-3">
+                           {/* Mobile Tab Switcher */}
+                           <div className="md:hidden flex border-b border-slate-200 bg-white sticky top-0 z-40">
+                              {[
+                                { id: 'nav', label: 'List', icon: <Activity size={14}/> },
+                                { id: 'editor', label: 'Edit', icon: <Edit3 size={14}/> },
+                                { id: 'preview', label: 'View', icon: <Eye size={14}/> }
+                              ].map(tab => (
+                                <button 
+                                  key={tab.id}
+                                  onClick={() => setActiveTab(tab.id)}
+                                  className={`flex-1 py-3 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === tab.id ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50/50' : 'text-slate-400'}`}
+                                >
+                                  {tab.icon} {tab.label}
+                                </button>
+                              ))}
+                           </div>
+
                            <div className="flex-1 flex overflow-hidden">
                               {/* Pane 1: Question Navigator Sidebar */}
-                              <div className="w-16 md:w-56 border-r border-slate-200 bg-slate-50/50 flex flex-col shrink-0">
+                              <div className={`${activeTab === 'nav' ? 'flex' : 'hidden'} md:flex w-full md:w-56 border-r border-slate-200 bg-slate-50/50 flex-col shrink-0`}>
                                  <div className="p-4 border-b border-slate-200 flex flex-col gap-3 bg-white">
                                     <div className="flex justify-between items-center">
                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Questions</span>
@@ -537,9 +555,9 @@ export default function SyllabusBuilder() {
                                        <button onClick={addQuestion} className="mt-4 px-6 py-2 bg-slate-900 text-white rounded-lg text-xs font-black uppercase">Start Authoring</button>
                                     </div>
                                  ) : (
-                                 <div className="flex-1 flex flex-col md:flex-row overflow-hidden bg-white">
+                                 <div className="flex-1 flex flex-col lg:flex-row overflow-hidden bg-white">
                                     {/* EDITOR COLUMN */}
-                                    <div className="flex-1 flex flex-col border-r border-slate-100 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+                                    <div className={`${activeTab === 'editor' ? 'flex' : 'hidden'} lg:flex flex-1 flex-col border-r border-slate-100 overflow-y-auto p-4 md:p-6 space-y-6 custom-scrollbar`}>
                                        <div className="space-y-3">
                                           <div className="flex justify-between items-center">
                                              <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Problem Task (Markdown + KaTeX)</label>
@@ -596,9 +614,9 @@ export default function SyllabusBuilder() {
                                        </div>
                                     </div>
 
-                                    <div className="flex-1 flex flex-col bg-slate-50/50 p-6 space-y-4 overflow-y-auto custom-scrollbar">
+                                    <div className={`${activeTab === 'preview' ? 'flex' : 'hidden'} lg:flex flex-1 flex-col bg-slate-50/50 p-4 md:p-6 space-y-4 overflow-y-auto custom-scrollbar`}>
                                        <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Live Learner Preview</label>
-                                       <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm grow flex flex-col min-h-0">
+                                       <div className="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm grow flex flex-col min-h-0">
                                           <div className="mb-6 flex-1 min-h-0">
                                              <MarkdownPreviewBlock content={activeQ.description || activeQ.text || activeQ.task || ''} />
                                           </div>
