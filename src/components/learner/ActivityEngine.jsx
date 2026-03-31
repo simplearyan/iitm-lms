@@ -178,7 +178,7 @@ export default function ActivityEngine({ item, course }) {
                  {/* Question Canvas: Academic Stylization per Reference Image */}
                  <div className="select-none h-full w-full">
                    <div className="mb-4 md:mb-8">
-                     <h3 className="text-[1.3rem] [&_p]:text-[1.3rem] [&_li]:text-[1.3rem] [&_p]:text-slate-900 [&_li]:text-slate-900 text-slate-900 font-bold leading-relaxed selection:bg-[#7A1B1E]/10 relative z-0">
+                     <h3 className="text-[1.1rem] md:text-[1.3rem] [&_p]:text-[1.1rem] md:[&_p]:text-[1.3rem] [&_li]:text-[1.1rem] md:[&_li]:text-[1.3rem] [&_p]:text-slate-900 [&_li]:text-slate-900 text-slate-900 font-bold leading-relaxed selection:bg-[#7A1B1E]/10 relative z-0">
                         <MarkdownRenderer content={question.description || question.text} />
                      </h3>
                    </div>
