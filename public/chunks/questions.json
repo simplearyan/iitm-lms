@@ -96,7 +96,7 @@
       "id": "m2_q1",
       "text": "1) Choose the set of correct options using Figure M2W1AQ1. Let $A = (1, 2)$ and $B = (2, 3)$. Which of the following are true?",
       "type": "checkbox",
-      "image": "/m2_w1_aq1.png",
+      "image": "m2_w1_aq1.png",
       "options": [
         "$2A$ is the vector $(2, 4)$",
         "$3B$ is the vector $(6, 9)$",

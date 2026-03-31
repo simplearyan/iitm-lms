@@ -178,7 +178,7 @@ export default function ActivityEngine({ item, course }) {
                  {/* Question Canvas: Academic Stylization per Reference Image */}
                  <div className="select-none h-full w-full">
                    <div className="mb-8">
-                     <h3 className="text-[1.5rem] [&_p]:text-[1.3rem] [&_p]:text-slate-900 text-slate-900 font-bold leading-relaxed selection:bg-indigo-100 relative z-0">
+                     <h3 className="text-[1.3rem] [&_p]:text-[1.3rem] [&_li]:text-[1.3rem] [&_p]:text-slate-900 [&_li]:text-slate-900 text-slate-900 font-bold leading-relaxed selection:bg-[#7A1B1E]/10 relative z-0">
                         <MarkdownRenderer content={question.description || question.text} />
                      </h3>
                    </div>
@@ -196,7 +196,7 @@ export default function ActivityEngine({ item, course }) {
                      const alphaLabel = String.fromCharCode(65 + oIdx);
  
                      const labelClass = isChecked 
-                        ? 'border-2 border-indigo-600 bg-indigo-50/20' 
+                        ? 'border-2 border-[#7A1B1E] bg-[#7A1B1E]/5' 
                         : 'border border-slate-200 hover:border-slate-300 hover:bg-slate-50/50';
  
                      return (
@@ -207,11 +207,11 @@ export default function ActivityEngine({ item, course }) {
                          <input type="radio" className="hidden" checked={isChecked} onChange={() => handleOptionSelect(oIdx)} />
                          <div className={`
                            w-7 h-7 rounded-full border-2 flex items-center justify-center shrink-0 text-[10px] font-black transition-all mr-5
-                           ${isChecked ? 'bg-indigo-600 border-indigo-600 text-white shadow-md' : 'bg-white border-slate-200 text-slate-400'}
+                           ${isChecked ? 'bg-[#7A1B1E] border-[#7A1B1E] text-white shadow-md' : 'bg-white border-slate-200 text-slate-400'}
                          `}>
                               {alphaLabel}
                          </div>
-                         <div className={`text-base md:text-lg font-medium pt-0.5 leading-relaxed ${isChecked ? 'text-indigo-950 font-bold underline decoration-indigo-200 underline-offset-4' : 'text-slate-800'}`}>
+                         <div className={`text-base md:text-lg font-medium pt-0.5 leading-relaxed ${isChecked ? 'text-slate-900 font-bold underline decoration-[#7A1B1E]/20 underline-offset-4' : 'text-slate-800'}`}>
                            <MarkdownRenderer content={opt}/>
                          </div>
                        </label>
