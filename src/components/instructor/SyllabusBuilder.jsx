@@ -78,7 +78,8 @@ export default function SyllabusBuilder() {
   
   const [activeModuleId, setActiveModuleId] = useState(course?.modules?.[0]?.id);
   const [editingItemId, setEditingItemId] = useState(null);
-  const [selectedQIndex, setSelectedQIndex] = useState(0); // For V2 Navigator Sidebar
+  const [selectedQIndex, setSelectedQIndex] = useState(0); 
+  const [importQId, setImportQId] = useState(''); // New: Import Query
 
   if (!course) return <div className="p-10 text-center font-bold text-slate-500">Course not found</div>;
 
@@ -440,7 +441,12 @@ export default function SyllabusBuilder() {
 
                     const updateQuestion = (qIndex, field, value) => {
                         const newQs = [...safeQuestions];
-                        newQs[qIndex] = { ...newQs[qIndex], [field]: value };
+                        // Special: if updating 'description', also update 'text' to maintain parity with master bank schema
+                        if (field === 'description') {
+                           newQs[qIndex] = { ...newQs[qIndex], description: value, text: value };
+                        } else {
+                           newQs[qIndex] = { ...newQs[qIndex], [field]: value };
+                        }
                         updateEditingItem('questions', newQs);
                     };
 
@@ -462,7 +468,26 @@ export default function SyllabusBuilder() {
                         const newQs = safeQuestions.filter((_, idx) => idx !== qIndex);
                         updateEditingItem('questions', newQs);
                         if (selectedQIndex >= newQs.length) setSelectedQIndex(newQs.length - 1);
-                    }
+                    };
+
+                    const importQuestionById = () => {
+                        if (!importQId) return;
+                        const found = globalQuestions.find(q => q.id === importQId);
+                        if (found) {
+                            const newQs = [...safeQuestions, { ...found }];
+                            updateEditingItem('questions', newQs);
+                            setSelectedQIndex(newQs.length - 1);
+                            setImportQId('');
+                        } else {
+                            alert("Question ID not found in Global Bank.");
+                        }
+                    };
+
+                    const pushToGlobalBank = (q) => {
+                       const { updateGlobalQuestion } = useStore.getState();
+                       updateGlobalQuestion(q);
+                       alert(`Successfully updated ${q.id} in Master Bank!`);
+                    };
 
                     const activeQ = safeQuestions[selectedQIndex] || safeQuestions[0] || {};
 
@@ -471,9 +496,23 @@ export default function SyllabusBuilder() {
                            <div className="flex-1 flex overflow-hidden">
                               {/* Pane 1: Question Navigator Sidebar */}
                               <div className="w-16 md:w-56 border-r border-slate-200 bg-slate-50/50 flex flex-col shrink-0">
-                                 <div className="p-4 border-b border-slate-200 flex justify-between items-center bg-white">
-                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest hidden md:block">Questions</span>
-                                    <button onClick={addQuestion} className="p-1 hover:bg-slate-100 rounded text-slate-500"><Plus size={16}/></button>
+                                 <div className="p-4 border-b border-slate-200 flex flex-col gap-3 bg-white">
+                                    <div className="flex justify-between items-center">
+                                       <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Questions</span>
+                                       <button onClick={addQuestion} className="p-1 hover:bg-slate-100 rounded text-slate-500" title="New Question"><Plus size={16}/></button>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                       <input 
+                                          type="text"
+                                          value={importQId}
+                                          onChange={(e) => setImportQId(e.target.value)}
+                                          placeholder="Fetch by ID..."
+                                          className="flex-1 text-[10px] font-bold p-1.5 border border-slate-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-400 bg-slate-50"
+                                       />
+                                       <button onClick={importQuestionById} className="p-1.5 bg-slate-900 text-white rounded hover:bg-slate-800 transition-colors">
+                                          <Download size={12}/>
+                                       </button>
+                                    </div>
                                  </div>
                                  <div className="flex-1 overflow-y-auto p-2 space-y-1 custom-scrollbar">
                                     {safeQuestions.map((q, idx) => (
@@ -508,7 +547,7 @@ export default function SyllabusBuilder() {
                                           </div>
                                           <textarea 
                                              rows="4" 
-                                             value={activeQ.description || ''} 
+                                             value={activeQ.description || activeQ.text || activeQ.task || ''} 
                                              onChange={e => updateQuestion(selectedQIndex, 'description', e.target.value)} 
                                              className="w-full p-4 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-100 font-mono text-xs text-slate-800 bg-slate-50/10 placeholder:opacity-40" 
                                              placeholder="Enter problem statement with $math$ and **bold** labels..." 
@@ -536,8 +575,24 @@ export default function SyllabusBuilder() {
                                        </div>
 
                                        <div className="space-y-3">
-                                          <label className="text-[9px] font-black text-amber-600 uppercase tracking-widest block">Solution Reasoning</label>
-                                          <textarea rows="3" value={activeQ.solution || ''} onChange={e => updateQuestion(selectedQIndex, 'solution', e.target.value)} className="w-full p-4 border border-amber-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-200 font-mono text-xs text-amber-900 bg-amber-50/20" placeholder="Explain the logic..." />
+                                          <div className="flex justify-between items-center">
+                                             <label className="text-[9px] font-black text-amber-600 uppercase tracking-widest block leading-none">Detailed Solution Reasoning</label>
+                                             {globalQuestions.some(gq => gq.id === activeQ.id) && (
+                                                <button 
+                                                   onClick={() => pushToGlobalBank(activeQ)}
+                                                   className="text-[9px] font-black text-blue-600 hover:text-blue-700 bg-blue-50 px-2 py-1 rounded border border-blue-100 uppercase flex items-center gap-1 transition-all"
+                                                >
+                                                   <Save size={10}/> Sync to Global Bank
+                                                </button>
+                                             )}
+                                          </div>
+                                          <textarea 
+                                             rows="3" 
+                                             value={activeQ.solution || ''} 
+                                             onChange={e => updateQuestion(selectedQIndex, 'solution', e.target.value)} 
+                                             className="w-full p-4 border border-amber-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-200 font-mono text-xs text-amber-900 bg-amber-50/20" 
+                                             placeholder="Explain the logic..." 
+                                          />
                                        </div>
                                     </div>
 
@@ -545,7 +600,7 @@ export default function SyllabusBuilder() {
                                        <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Live Learner Preview</label>
                                        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm grow flex flex-col min-h-0">
                                           <div className="mb-6 flex-1 min-h-0">
-                                             <MarkdownPreviewBlock content={activeQ.description || ''} />
+                                             <MarkdownPreviewBlock content={activeQ.description || activeQ.text || activeQ.task || ''} />
                                           </div>
                                           <div className="space-y-2">
                                              {(activeQ.options || []).map((opt, oIdx) => (
