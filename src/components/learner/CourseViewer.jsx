@@ -50,6 +50,19 @@ export default function CourseViewer() {
     }
   }, [course, itemId]);
 
+  // Dynamic Browser Tab Title for SEO/UX
+  useEffect(() => {
+    if (activeItem) {
+      const typeLabel = 
+        activeItem.type === 'note' ? 'Reading' :
+        activeItem.type === 'video' ? 'Video' :
+        activeItem.type === 'activity' ? 'Assessment' : 'Course';
+      document.title = `${typeLabel}: ${activeItem.title} | IITM Unified LMS`;
+    } else if (course) {
+      document.title = `${course.title} | IITM Unified LMS`;
+    }
+  }, [activeItem, course]);
+
   if (!course) return <Navigate to="/" />;
 
   const currentModule = course.modules.find(m => m.items.some(i => i.id === activeItem?.id));

@@ -115,7 +115,7 @@ export default function WhiteboardOverlay({
         const [x1, y1] = el.points[0];
         const [x2, y2] = el.points[1];
         rc.rectangle(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2 - x1), Math.abs(y2 - y1), options);
-      } else if (el.type === 'ellipse' && el.points.length === 2) {
+      } else if ((el.type === 'ellipse' || el.type === 'circle') && el.points.length === 2) {
         const [x1, y1] = el.points[0];
         const [x2, y2] = el.points[1];
         rc.ellipse(x1 + (x2 - x1)/2, y1 + (y2 - y1)/2, Math.abs(x2 - x1), Math.abs(y2 - y1), options);
@@ -153,7 +153,7 @@ export default function WhiteboardOverlay({
     // Always get fresh element list from Zustand to bypass stale drag closures
     const currentElements = useStore.getState().whiteboardData[questionId] || [];
 
-    if (['pen', 'line', 'arrow', 'rectangle', 'ellipse', 'triangle', 'graph'].includes(tool)) {
+    if (['pen', 'line', 'arrow', 'rectangle', 'ellipse', 'circle', 'triangle', 'graph'].includes(tool)) {
       const newElement = {
         type: tool,
         points: tool === 'pen' ? [[pos.x, pos.y]] : [[pos.x, pos.y], [pos.x, pos.y]], 
@@ -181,7 +181,7 @@ export default function WhiteboardOverlay({
       const newElements = [...currentElements.slice(0, -1), lastElement];
       updateWhiteboardData(questionId, newElements);
       redraw();
-    } else if (['line', 'arrow', 'rectangle', 'ellipse', 'triangle', 'graph'].includes(tool)) {
+    } else if (['line', 'arrow', 'rectangle', 'ellipse', 'circle', 'triangle', 'graph'].includes(tool)) {
       if (currentElements.length === 0) return;
       const lastElement = {...currentElements[currentElements.length - 1]};
       lastElement.points = [lastElement.points[0], [pos.x, pos.y]];

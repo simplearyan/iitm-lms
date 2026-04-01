@@ -26,6 +26,13 @@ export default function Layout() {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, [fetchData]);
 
+  // Dynamic Browser Tab Title for Dashboard / Fallback
+  useEffect(() => {
+    if (location.pathname === '/') {
+      document.title = 'Dashboard | IITM Unified LMS';
+    }
+  }, [location.pathname]);
+
   if (loading) return null;
 
   return (
