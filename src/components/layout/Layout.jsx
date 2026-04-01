@@ -26,7 +26,7 @@ export default function Layout() {
   if (loading) return null;
 
   return (
-    <div className="flex min-h-screen bg-slate-50 font-sans text-slate-900 overflow-hidden">
+    <div className="flex min-h-screen bg-slate-50 font-sans text-slate-900 overflow-auto md:overflow-hidden">
 
       {/* Global Minimal Sidebar (Desktop) */}
       {!isEmbed && (
@@ -68,26 +68,15 @@ export default function Layout() {
       )}
 
       {/* Main Content Pane */}
-      <main className="flex-1 flex flex-col min-w-0 h-screen relative z-10">
+      <main className="flex-1 flex flex-col min-w-0 h-auto md:h-screen relative z-10">
 
         {/* Top Navbar */}
         {!isEmbed && (
-          <nav className="h-[72px] bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-8 shrink-0 z-40 shadow-[0_1px_4px_rgba(0,0,0,0.02)] relative">
+          <nav className={`h-[72px] bg-white border-b border-slate-200 items-center justify-between px-4 md:px-8 shrink-0 z-40 shadow-[0_1px_4px_rgba(0,0,0,0.02)] relative ${location.pathname !== '/' ? 'hidden md:flex' : 'flex'}`}>
 
             <div className="flex items-center gap-4">
               {/* Universal Hamburger: Toggles Mobile Nav on Mobile, Toggles Syllabus on Desktop */}
-              <button
-                className="text-slate-600 p-2 hover:bg-slate-100 rounded-lg transition-colors"
-                onClick={() => {
-                  if (window.innerWidth < 768) {
-                    setIsMobileNavOpen(true);
-                  } else {
-                    toggleSidebar();
-                  }
-                }}
-              >
-                <Menu size={24} strokeWidth={2.5} />
-              </button>
+              {/* Hamburger menu removed per user request for de-cluttering */}
 
               <Link to="/" className="flex items-center gap-3 md:gap-4 group shrink-0">
                 <div className="w-10 h-10 bg-[#7A1B1E] rounded-full flex items-center justify-center text-white font-black text-lg shadow-inner group-hover:rotate-12 transition-transform shrink-0">
@@ -105,45 +94,47 @@ export default function Layout() {
               </Link>
             </div>
 
-            <div className="flex items-center gap-4 md:gap-8">
-              {/* View Switcher toggle */}
-              <div className="flex items-center bg-slate-100/80 p-1 rounded-xl border border-slate-200">
-                <button
-                  onClick={() => setRole('learner')}
-                  className={`px-3 py-1.5 md:px-4 md:py-2 text-[10px] md:text-sm font-bold rounded-lg transition-all ${role === 'learner' ? 'bg-white text-indigo-700 shadow-sm border border-slate-200' : 'text-slate-500 hover:text-slate-800 border border-transparent'}`}
-                >
-                  <span className="md:hidden">L</span>
-                  <span className="hidden md:inline">Learner</span>
+            {location.pathname === '/' && (
+              <div className="flex items-center gap-4 md:gap-8">
+                {/* View Switcher toggle */}
+                <div className="flex items-center bg-slate-100/80 p-1 rounded-xl border border-slate-200">
+                  <button
+                    onClick={() => setRole('learner')}
+                    className={`px-3 py-1.5 md:px-4 md:py-2 text-[10px] md:text-sm font-bold rounded-lg transition-all ${role === 'learner' ? 'bg-white text-indigo-700 shadow-sm border border-slate-200' : 'text-slate-500 hover:text-slate-800 border border-transparent'}`}
+                  >
+                    <span className="md:hidden">L</span>
+                    <span className="hidden md:inline">Learner</span>
+                  </button>
+                  <button
+                    onClick={() => setRole('instructor')}
+                    className={`px-4 py-2 md:px-4 md:py-2 text-[10px] md:text-sm font-bold rounded-lg transition-all ${role === 'instructor' ? 'bg-white text-orange-600 shadow-sm border border-slate-200' : 'text-slate-500 hover:text-slate-800 border border-transparent'}`}
+                  >
+                    <span className="md:hidden">I</span>
+                    <span className="hidden md:inline">Instructor</span>
+                  </button>
+                </div>
+
+                {/* Profile Tools (Desktop/Large Only) */}
+                <div className="hidden xl:flex items-center gap-3 text-slate-700 font-bold text-sm bg-slate-50 border border-slate-200 px-4 py-2 rounded-xl">
+                  <span className="uppercase tracking-widest text-[#7A1B1E]">{user?.name || 'Student Demo'}</span>
+                  <User size={18} className="text-slate-400" />
+                </div>
+
+                <button className="hidden lg:flex text-slate-600 hover:text-slate-900 font-bold items-center gap-1.5 text-sm uppercase tracking-wider">
+                  Updates <div className="w-2 h-2 bg-indigo-500 rounded-full mb-3 ml-0.5"></div>
                 </button>
-                <button
-                  onClick={() => setRole('instructor')}
-                  className={`px-4 py-2 md:px-4 md:py-2 text-[10px] md:text-sm font-bold rounded-lg transition-all ${role === 'instructor' ? 'bg-white text-orange-600 shadow-sm border border-slate-200' : 'text-slate-500 hover:text-slate-800 border border-transparent'}`}
-                >
-                  <span className="md:hidden">I</span>
-                  <span className="hidden md:inline">Instructor</span>
+
+                <button className="p-2 md:px-5 md:py-2.5 border-2 border-slate-200 rounded-xl hover:bg-slate-50 hover:border-slate-300 text-sm font-bold transition-all shadow-sm">
+                  <span className="hidden md:block">SIGN OUT</span>
+                  <LogOut size={18} className="md:hidden text-slate-600" strokeWidth={2.5} />
                 </button>
               </div>
-
-              {/* Profile Tools (Desktop/Large Only) */}
-              <div className="hidden xl:flex items-center gap-3 text-slate-700 font-bold text-sm bg-slate-50 border border-slate-200 px-4 py-2 rounded-xl">
-                <span className="uppercase tracking-widest text-[#7A1B1E]">{user?.name || 'Student Demo'}</span>
-                <User size={18} className="text-slate-400" />
-              </div>
-
-              <button className="hidden lg:flex text-slate-600 hover:text-slate-900 font-bold items-center gap-1.5 text-sm uppercase tracking-wider">
-                Updates <div className="w-2 h-2 bg-indigo-500 rounded-full mb-3 ml-0.5"></div>
-              </button>
-
-              <button className="p-2 md:px-5 md:py-2.5 border-2 border-slate-200 rounded-xl hover:bg-slate-50 hover:border-slate-300 text-sm font-bold transition-all shadow-sm">
-                <span className="hidden md:block">SIGN OUT</span>
-                <LogOut size={18} className="md:hidden text-slate-600" strokeWidth={2.5} />
-              </button>
-            </div>
+            )}
           </nav>
         )}
 
         {/* View Content (Dashboard, Syllabus, etc) */}
-        <div className="flex-1 overflow-y-auto bg-slate-50/50 relative">
+        <div className="flex-1 overflow-y-visible md:overflow-y-auto bg-slate-50/50 relative">
           <Outlet />
         </div>
       </main>

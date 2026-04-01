@@ -167,7 +167,7 @@ export default function CourseViewer() {
             
             {/* Universal Actions Bar (Floating/Fixed at top right) */}
             {!isEmbed && (
-              <div className="absolute top-4 right-4 md:top-6 md:right-6 z-30">
+              <div className="hidden md:block absolute top-4 right-4 md:top-6 md:right-6 z-30">
                 <button 
                   onClick={() => setShowEmbedModal(true)}
                   className="flex items-center gap-2 px-2 py-1.5 md:px-4 md:py-2 bg-white/90 backdrop-blur border border-slate-200 rounded-xl text-[10px] md:text-xs font-bold text-slate-500 hover:text-indigo-600 hover:border-indigo-200 transition-all shadow-md hover:shadow-lg active:scale-95"
@@ -179,9 +179,9 @@ export default function CourseViewer() {
               </div>
             )}
 
-            {/* Context Header (Small Strip for Quiz/Term Exam/Assignments) */}
+            {/* Context Header (Title Strip - Hidden on Mobile per user request) */}
             {activeItem.type !== 'activity' && activeItem.type !== 'video' && activeItem.type !== 'note' && (
-              <div className="px-4 py-2 md:px-8 md:py-2.5 bg-slate-50/50 border-b border-slate-200 flex flex-col md:flex-row md:items-center gap-1 md:gap-4 shrink-0 transition-all">
+              <div className="hidden md:flex px-4 py-2 md:px-8 md:py-2.5 bg-slate-50/50 border-b border-slate-200 flex-col md:flex-row md:items-center gap-1 md:gap-4 shrink-0 transition-all">
                  <div className="flex items-center gap-2 text-[9px] font-bold tracking-widest text-slate-400 uppercase shrink-0">
                    <span>{currentModule?.title}</span>
                    <span className="w-1 h-1 rounded-full bg-slate-300"></span>
