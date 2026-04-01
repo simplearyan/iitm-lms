@@ -3,11 +3,14 @@ import { Outlet, Link, useLocation } from 'react-router-dom';
 import useStore from '../../store/useStore';
 import {
   Book, Clock, Calendar, FileText, Award, HelpCircle,
-  User, Menu, LogOut, Database
+  User, Menu, LogOut, Database, Share2, X
 } from 'lucide-react';
 
 export default function Layout() {
-  const { user, role, setRole, loading, isSidebarCollapsed, toggleSidebar, isEmbed, isLocalDraft, fetchData } = useStore();
+  const { 
+    user, role, setRole, loading, isSidebarCollapsed, toggleSidebar, 
+    isEmbed, isLocalDraft, fetchData, showEmbedModal, setShowEmbedModal 
+  } = useStore();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const location = useLocation();
 
@@ -94,40 +97,57 @@ export default function Layout() {
               </Link>
             </div>
 
-            {location.pathname === '/' && (
-              <div className="flex items-center gap-4 md:gap-8">
-                {/* View Switcher toggle */}
-                <div className="flex items-center bg-slate-100/80 p-1 rounded-xl border border-slate-200">
-                  <button
-                    onClick={() => setRole('learner')}
-                    className={`px-3 py-1.5 md:px-4 md:py-2 text-[10px] md:text-sm font-bold rounded-lg transition-all ${role === 'learner' ? 'bg-white text-indigo-700 shadow-sm border border-slate-200' : 'text-slate-500 hover:text-slate-800 border border-transparent'}`}
+            {!isEmbed && (
+              <div className="flex items-center gap-2 md:gap-8 ml-auto">
+                {/* Global Embed Tool (Desktop - Content Pages Only) */}
+                {location.pathname !== '/' && (
+                  <button 
+                    onClick={() => setShowEmbedModal(true)}
+                    className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-[10px] font-black text-slate-500 hover:text-indigo-600 hover:border-indigo-200 transition-all uppercase tracking-widest shadow-sm"
+                    title="Embed this session"
                   >
-                    <span className="md:hidden">L</span>
-                    <span className="hidden md:inline">Learner</span>
+                    <Share2 size={14} />
+                    <span className="hidden xl:inline">Embed Note</span>
                   </button>
-                  <button
-                    onClick={() => setRole('instructor')}
-                    className={`px-4 py-2 md:px-4 md:py-2 text-[10px] md:text-sm font-bold rounded-lg transition-all ${role === 'instructor' ? 'bg-white text-orange-600 shadow-sm border border-slate-200' : 'text-slate-500 hover:text-slate-800 border border-transparent'}`}
-                  >
-                    <span className="md:hidden">I</span>
-                    <span className="hidden md:inline">Instructor</span>
-                  </button>
-                </div>
+                )}
 
-                {/* Profile Tools (Desktop/Large Only) */}
-                <div className="hidden xl:flex items-center gap-3 text-slate-700 font-bold text-sm bg-slate-50 border border-slate-200 px-4 py-2 rounded-xl">
-                  <span className="uppercase tracking-widest text-[#7A1B1E]">{user?.name || 'Student Demo'}</span>
-                  <User size={18} className="text-slate-400" />
-                </div>
+                {/* Dashboard-Only Tools (Profile, Sign Out, View Switcher) */}
+                {location.pathname === '/' && (
+                  <div className="flex items-center gap-4 md:gap-8">
+                    {/* View Switcher toggle */}
+                    <div className="flex items-center bg-slate-100/80 p-1 rounded-xl border border-slate-200">
+                      <button
+                        onClick={() => setRole('learner')}
+                        className={`px-3 py-1.5 md:px-4 md:py-2 text-[10px] md:text-sm font-bold rounded-lg transition-all ${role === 'learner' ? 'bg-white text-indigo-700 shadow-sm border border-slate-200' : 'text-slate-500 hover:text-slate-800 border border-transparent'}`}
+                      >
+                        <span className="md:hidden">L</span>
+                        <span className="hidden md:inline">Learner</span>
+                      </button>
+                      <button
+                        onClick={() => setRole('instructor')}
+                        className={`px-4 py-2 md:px-4 md:py-2 text-[10px] md:text-sm font-bold rounded-lg transition-all ${role === 'instructor' ? 'bg-white text-orange-600 shadow-sm border border-slate-200' : 'text-slate-500 hover:text-slate-800 border border-transparent'}`}
+                      >
+                        <span className="md:hidden">I</span>
+                        <span className="hidden md:inline">Instructor</span>
+                      </button>
+                    </div>
 
-                <button className="hidden lg:flex text-slate-600 hover:text-slate-900 font-bold items-center gap-1.5 text-sm uppercase tracking-wider">
-                  Updates <div className="w-2 h-2 bg-indigo-500 rounded-full mb-3 ml-0.5"></div>
-                </button>
+                    {/* Profile Tools (Desktop/Large Only) */}
+                    <div className="hidden xl:flex items-center gap-3 text-slate-700 font-bold text-sm bg-slate-50 border border-slate-200 px-4 py-2 rounded-xl">
+                      <span className="uppercase tracking-widest text-[#7A1B1E]">{user?.name || 'Student Demo'}</span>
+                      <User size={18} className="text-slate-400" />
+                    </div>
 
-                <button className="p-2 md:px-5 md:py-2.5 border-2 border-slate-200 rounded-xl hover:bg-slate-50 hover:border-slate-300 text-sm font-bold transition-all shadow-sm">
-                  <span className="hidden md:block">SIGN OUT</span>
-                  <LogOut size={18} className="md:hidden text-slate-600" strokeWidth={2.5} />
-                </button>
+                    <button className="hidden lg:flex text-slate-600 hover:text-slate-900 font-bold items-center gap-1.5 text-sm uppercase tracking-wider">
+                      Updates <div className="w-2 h-2 bg-indigo-500 rounded-full mb-3 ml-0.5"></div>
+                    </button>
+
+                    <button className="p-2 md:px-5 md:py-2.5 border-2 border-slate-200 rounded-xl hover:bg-slate-50 hover:border-slate-300 text-sm font-bold transition-all shadow-sm">
+                      <span className="hidden md:block">SIGN OUT</span>
+                      <LogOut size={18} className="md:hidden text-slate-600" strokeWidth={2.5} />
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </nav>
@@ -138,6 +158,61 @@ export default function Layout() {
           <Outlet />
         </div>
       </main>
+
+      {/* Global Embed Code Modal */}
+      {showEmbedModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200 border border-slate-200">
+            <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600">
+                  <Share2 size={18} />
+                </div>
+                <h3 className="font-black text-slate-900 tracking-tight">Embed Content</h3>
+              </div>
+              <button 
+                onClick={() => setShowEmbedModal(false)}
+                className="p-1 text-slate-400 hover:text-slate-600 hover:bg-white rounded-lg transition-all"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="p-6 space-y-4">
+              <p className="text-sm text-slate-500 font-medium leading-relaxed">Copy the code below to integrate this modular session into your own LMS, website, or blog.</p>
+              
+              <div className="bg-slate-900 rounded-xl p-4 font-mono text-xs text-indigo-300 leading-relaxed overflow-x-auto relative group border border-slate-700">
+                <code>
+                  {`<iframe \n  src="${window.location.origin}${window.location.pathname}?embed=true${window.location.hash}" \n  width="100%" \n  height="600px" \n  style="border: 0; border-radius: 12px; overflow: hidden;"\n></iframe>`}
+                </code>
+                <button 
+                  onClick={() => {
+                    const code = `<iframe src="${window.location.origin}${window.location.pathname}?embed=true${window.location.hash}" width="100%" height="600px" style="border: 0; border-radius: 12px; overflow: hidden;"></iframe>`;
+                    navigator.clipboard.writeText(code);
+                  }}
+                  className="absolute top-2 right-2 px-2 py-1 bg-white/10 hover:bg-indigo-500 hover:text-white rounded-md text-[10px] font-black transition-all uppercase opacity-0 group-hover:opacity-100 border border-white/20"
+                >
+                  Copy Snippet
+                </button>
+              </div>
+
+              <div className="flex items-center gap-2 p-3 bg-indigo-50 rounded-lg border border-indigo-100 text-[10px] sm:text-xs text-indigo-700 font-medium leading-normal">
+                <HelpCircle size={14} className="shrink-0" />
+                This iframe will dynamically load the current activity or video in a distraction-free student view.
+              </div>
+            </div>
+
+            <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
+              <button 
+                onClick={() => setShowEmbedModal(false)}
+                className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-xs font-black text-slate-600 hover:bg-slate-50 transition-all uppercase tracking-widest"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

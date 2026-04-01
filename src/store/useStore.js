@@ -13,8 +13,10 @@ const useStore = create((set) => ({
   // Global Authoring Context
   currentYear: '2024',
   currentTerm: 'T1', // T1 (Jan-Apr), T2 (May-Aug), T3 (Sep-Dec)
+  showEmbedModal: false,
   
   // Actions
+  setShowEmbedModal: (show) => set({ showEmbedModal: show }),
   toggleSidebar: () => set((state) => ({ isSidebarCollapsed: !state.isSidebarCollapsed })),
   setRole: (role) => set({ role }),
   setIsEmbed: (isEmbed) => set({ isEmbed }),

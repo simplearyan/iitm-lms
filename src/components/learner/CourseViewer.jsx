@@ -14,7 +14,6 @@ export default function CourseViewer() {
   
   const [expandedModules, setExpandedModules] = useState([]);
   const [activeItem, setActiveItem] = useState(null);
-  const [showEmbedModal, setShowEmbedModal] = useState(false);
   const [isMobileSyllabusOpen, setIsMobileSyllabusOpen] = useState(false);
 
   // Sync activeItem and expandedModules with URL params
@@ -164,21 +163,7 @@ export default function CourseViewer() {
           </div>
         ) : (
           <div key={activeItem.id} className={`flex-1 relative flex flex-col bg-slate-50 ${(activeItem.type === 'activity' || activeItem.type === 'video') ? 'overflow-hidden' : 'overflow-y-auto'}`}>
-            
-            {/* Universal Actions Bar (Floating/Fixed at top right) */}
-            {!isEmbed && (
-              <div className="hidden md:block absolute top-4 right-4 md:top-6 md:right-6 z-30">
-                <button 
-                  onClick={() => setShowEmbedModal(true)}
-                  className="flex items-center gap-2 px-2 py-1.5 md:px-4 md:py-2 bg-white/90 backdrop-blur border border-slate-200 rounded-xl text-[10px] md:text-xs font-bold text-slate-500 hover:text-indigo-600 hover:border-indigo-200 transition-all shadow-md hover:shadow-lg active:scale-95"
-                >
-                  <Share2 size={14} className="md:w-4 md:h-4" />
-                  <span className="hidden sm:inline">EMBED NOTE</span>
-                  <span className="sm:hidden">EMBED</span>
-                </button>
-              </div>
-            )}
-
+             
             {/* Context Header (Title Strip - Hidden on Mobile per user request) */}
             {activeItem.type !== 'activity' && activeItem.type !== 'video' && activeItem.type !== 'note' && (
               <div className="hidden md:flex px-4 py-2 md:px-8 md:py-2.5 bg-slate-50/50 border-b border-slate-200 flex-col md:flex-row md:items-center gap-1 md:gap-4 shrink-0 transition-all">
@@ -219,57 +204,6 @@ export default function CourseViewer() {
         )}
       </section>
 
-      {/* Embed Code Modal */}
-      {showEmbedModal && (
-        <div className="fixed inset-0 z-[500] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200 border border-slate-200">
-            <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-              <h3 className="font-black text-slate-900 tracking-tight">Embed This Note</h3>
-              <button 
-                onClick={() => setShowEmbedModal(false)}
-                className="p-1 text-slate-400 hover:text-slate-600 hover:bg-white rounded-lg transition-all"
-              >
-                <X size={20} />
-              </button>
-            </div>
-            
-            <div className="p-6 space-y-4">
-              <p className="text-sm text-slate-500 font-medium">Copy and paste this code to embed this session into your website or blog.</p>
-              
-              <div className="bg-slate-900 rounded-xl p-4 font-mono text-xs text-indigo-300 leading-relaxed overflow-x-auto relative group">
-                <code>
-                  {`<iframe \n  src="${window.location.origin}${window.location.pathname}?embed=true${window.location.hash}" \n  width="100%" \n  height="600px" \n  style="border: 0; border-radius: 12px; overflow: hidden;" \n  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" \n  allowfullscreen\n></iframe>`}
-                </code>
-                <button 
-                  onClick={() => {
-                    const code = `<iframe src="${window.location.origin}${window.location.pathname}?embed=true${window.location.hash}" width="100%" height="600px" style="border: 0; border-radius: 12px; overflow: hidden;" allowfullscreen></iframe>`;
-                    navigator.clipboard.writeText(code);
-                  }}
-                  className="absolute top-2 right-2 px-2 py-1 bg-white/10 hover:bg-white/20 rounded-md text-[10px] font-bold text-white transition-all uppercase opacity-0 group-hover:opacity-100"
-                >
-                  Copy
-                </button>
-              </div>
-              
-              <div className="bg-amber-50 border border-amber-100 rounded-xl p-4 flex gap-3">
-                <div className="w-1.5 h-1.5 bg-amber-400 rounded-full mt-1.5 shrink-0"></div>
-                <p className="text-[11px] text-amber-800 font-bold leading-normal">
-                  NOTE: Ensure your platform supports iframe embeds (e.g., WordPress, Medium, or Notion custom HTML blocks).
-                </p>
-              </div>
-            </div>
-            
-            <div className="p-4 bg-slate-50 border-t border-slate-100 flex justify-end">
-              <button 
-                onClick={() => setShowEmbedModal(false)}
-                className="px-6 py-2 bg-slate-900 text-white text-xs font-black rounded-xl hover:bg-slate-800 transition-all shadow-lg shadow-slate-200"
-              >
-                DONE
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
