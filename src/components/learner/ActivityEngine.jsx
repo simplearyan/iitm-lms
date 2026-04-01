@@ -83,6 +83,7 @@ export default function ActivityEngine({ item, course }) {
   const [wbTool, setWbTool] = useState('pointer');
   const [wbColor, setWbColor] = useState('#0f172a');
   const [wbStrokeWidth, setWbStrokeWidth] = useState(2);
+  const [showMobileToolbox, setShowMobileToolbox] = useState(false);
 
   // Mark first question as visited on mount
   useEffect(() => {
@@ -136,14 +137,14 @@ export default function ActivityEngine({ item, course }) {
   const notVisitedCount = questions.length - visitedCount;
 
   return (
-    <div key={item.id} className="w-full h-full flex flex-col animate-fade-in relative bg-slate-50 overflow-hidden">
+    <div key={item.id} className="w-full min-h-screen md:h-full flex flex-col animate-fade-in relative bg-slate-50 overflow-hidden">
       
       {/* Mobile Floating Palette Trigger - REMOVED for static bottom approach */}
 
-      <div className="flex flex-col xl:flex-row gap-4 md:gap-6 flex-1 h-full p-2 md:p-4 lg:p-6 overflow-hidden">
+      <div className="flex flex-col xl:flex-row gap-4 md:gap-6 flex-1 h-full p-0 md:p-4 lg:p-6 overflow-hidden">
           
           {/* Main Question Column - Flex-grow to fill space */}
-          <div className="flex-1 flex flex-col bg-white overflow-hidden shadow-sm border border-slate-200 rounded-2xl relative min-w-0 min-h-[400px]">
+          <div className="flex-1 flex flex-col bg-white overflow-hidden md:shadow-sm md:border md:border-slate-200 md:rounded-2xl relative min-w-0 min-h-[400px]">
              
               {/* SLIM MOBILE HEADER: Context-First Focus */}
               <div className="bg-slate-50/80 backdrop-blur-sm border-b border-slate-200 px-4 py-2 md:px-6 md:py-4 flex flex-row justify-between items-center gap-4 shrink-0 transition-all">
@@ -165,7 +166,7 @@ export default function ActivityEngine({ item, course }) {
               </div>
 
               {/* COMPACT HIGH-FOCUS CONTENT: Question Accent #7A1B1E */}
-              <div className="flex-1 relative overflow-y-auto w-full custom-scrollbar bg-white">
+              <div className="flex-1 relative overflow-y-auto w-full custom-scrollbar bg-white pb-32 md:pb-0">
                  <div className="max-w-4xl px-3 py-4 md:px-6 md:py-10">
                     <WhiteboardOverlay 
                         questionId={`${item.id}-${question.id}-inline`} 
@@ -249,24 +250,39 @@ export default function ActivityEngine({ item, course }) {
               </div>
              </div>
 
-              {/* UNIFIED CONTROL BAR: Tools + Navigation (v2 Focus) */}
-              <div className="border-t border-slate-200 bg-white/95 backdrop-blur-md z-30 shrink-0">
-                  {/* Drawing Tools: Single Row Focus */}
-                  <div className="px-4 py-2 flex items-center justify-between gap-4 border-b border-slate-100">
-                      <div className="flex items-center gap-1.5 overflow-x-auto custom-scrollbar-hide bg-slate-50 p-1 rounded-xl">
-                          <button onClick={() => setWbTool('pointer')} className={`p-1.5 rounded-lg transition-all ${wbTool==='pointer'?'bg-indigo-600 text-white shadow-sm':'text-slate-500 hover:bg-white'}`}><MousePointer2 size={16}/></button>
-                          <button onClick={() => setWbTool('pen')} className={`p-1.5 rounded-lg transition-all ${wbTool==='pen'?'bg-indigo-600 text-white shadow-sm':'text-slate-500 hover:bg-white'}`}><PenTool size={16}/></button>
-                          <button onClick={() => setWbTool('eraser')} className={`p-1.5 rounded-lg transition-all ${wbTool==='eraser'?'bg-indigo-600 text-white shadow-sm':'text-slate-500 hover:bg-white'}`}><Eraser size={16}/></button>
-                          <div className="w-px h-5 bg-slate-200 mx-1"></div>
-                          {['#ef4444', '#3b82f6', '#10b981', '#0f172a'].map(c => (
-                              <button key={c} onClick={()=>setWbColor(c)} className={`w-3.5 h-3.5 rounded-full ring-offset-2 transition-all ${wbColor===c?'ring-2 ring-blue-500 scale-110 shadow-sm':''}`} style={{backgroundColor: c}}></button>
-                          ))}
-                          <div className="w-px h-5 bg-slate-200 mx-1"></div>
-                          <button onClick={() => setWbTool('line')} className={`p-1.5 rounded-md ${wbTool==='line'?'bg-indigo-100 text-indigo-700':'text-slate-500'}`}><Minus size={16}/></button>
-                          <button onClick={() => setWbTool('rectangle')} className={`p-1.5 rounded-md ${wbTool==='rectangle'?'bg-indigo-100 text-indigo-700':'text-slate-500'}`}><Square size={16}/></button>
+              {/* UNIFIED CONTROL BAR: Persistent Tools + Navigation (Fixed Bottom on Mobile) */}
+              <div className="fixed bottom-0 left-0 right-0 md:relative md:bottom-auto border-t border-slate-200 bg-white/95 backdrop-blur-md z-50 shrink-0 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+                  {/* Drawing Tools: Single Row Focus (Toggled on Mobile) */}
+                  <div className={`px-2 py-2 md:px-4 md:py-2 items-center justify-between gap-2 md:gap-4 border-b border-slate-100 ${showMobileToolbox ? 'flex' : 'hidden md:flex'}`}>
+                      <div className="flex items-center gap-1 md:gap-1.5 overflow-x-auto custom-scrollbar-hide bg-slate-50 p-1 md:p-1.5 rounded-xl">
+                          <button title="Pointer" onClick={() => setWbTool('pointer')} className={`p-1.5 rounded-lg transition-all ${wbTool==='pointer'?'bg-indigo-600 text-white shadow-sm':'text-slate-500 hover:bg-white'}`}><MousePointer2 size={16}/></button>
+                          <button title="Pen" onClick={() => setWbTool('pen')} className={`p-1.5 rounded-lg transition-all ${wbTool==='pen'?'bg-indigo-600 text-white shadow-sm':'text-slate-500 hover:bg-white'}`}><PenTool size={16}/></button>
+                          <button title="Eraser" onClick={() => setWbTool('eraser')} className={`p-1.5 rounded-lg transition-all ${wbTool==='eraser'?'bg-indigo-600 text-white shadow-sm':'text-slate-500 hover:bg-white'}`}><Eraser size={16}/></button>
+                          
+                          <div className="w-px h-5 bg-slate-200 mx-0.5"></div>
+                          
+                          <div className="flex items-center gap-1 px-1">
+                            {['#ef4444', '#3b82f6', '#10b981', '#0f172a'].map(c => (
+                                <button key={c} onClick={()=>setWbColor(c)} className={`w-3 h-3 md:w-3.5 md:h-3.5 rounded-full ring-offset-2 transition-all ${wbColor===c?'ring-2 ring-blue-500 scale-110 shadow-sm':''}`} style={{backgroundColor: c}}></button>
+                            ))}
+                          </div>
+                          
+                          <div className="w-px h-5 bg-slate-200 mx-0.5"></div>
+                          
+                          <div className="flex items-center gap-0.5">
+                            <button title="Line" onClick={() => setWbTool('line')} className={`p-1.5 rounded-lg transition-all ${wbTool==='line'?'bg-indigo-100 text-indigo-700':'text-slate-500 hover:bg-white'}`}><Minus size={16}/></button>
+                            <button title="Rectangle" onClick={() => setWbTool('rectangle')} className={`p-1.5 rounded-lg transition-all ${wbTool==='rectangle'?'bg-indigo-100 text-indigo-700':'text-slate-500 hover:bg-white'}`}><Square size={16}/></button>
+                            <button title="Circle" onClick={() => setWbTool('circle')} className={`p-1.5 rounded-lg transition-all ${wbTool==='circle'?'bg-indigo-100 text-indigo-700':'text-slate-500 hover:bg-white'}`}><Circle size={16}/></button>
+                            <button title="Triangle" onClick={() => setWbTool('triangle')} className={`p-1.5 rounded-lg transition-all ${wbTool==='triangle'?'bg-indigo-100 text-indigo-700':'text-slate-500 hover:bg-white'}`}><Triangle size={16}/></button>
+                          </div>
                       </div>
-                      <button onClick={() => updateWhiteboardData(`${item.id}-${question.id}-inline`, [])} className="text-[10px] font-black text-red-500 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-all uppercase flex items-center">
-                          <Trash size={12} className="mr-1.5" /> Clear Board
+                      <button 
+                        onClick={() => updateWhiteboardData(`${item.id}-${question.id}-inline`, [])} 
+                        className="text-[10px] font-black text-red-500 hover:bg-red-50 p-2 md:px-3 md:py-1.5 rounded-lg transition-all uppercase flex items-center shrink-0"
+                        title="Clear Board"
+                      >
+                          <Trash size={14} className="md:mr-1.5" /> 
+                          <span className="hidden md:inline">Clear Board</span>
                       </button>
                   </div>
 
@@ -309,6 +325,14 @@ export default function ActivityEngine({ item, course }) {
                       </div>
                   </div>
               </div>
+
+              {/* Mobile Context Tools FAB (Toggles the toolbox above) */}
+              <button 
+                onClick={() => setShowMobileToolbox(!showMobileToolbox)}
+                className={`md:hidden fixed bottom-24 right-4 w-12 h-12 rounded-full shadow-2xl flex items-center justify-center transition-all z-50 active:scale-95 ${showMobileToolbox ? 'bg-red-500 text-white rotate-90 scale-110' : 'bg-indigo-600 text-white hover:bg-indigo-700'}`}
+              >
+                {showMobileToolbox ? <X size={24} /> : <PenTool size={20} />}
+              </button>
 
              {/* STATIC BOTTOM PALETTE: Mobile-Only (Mock-Compatible) */}
               {/* Fixed mobile footer removed for vertical space optimization */}
