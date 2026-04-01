@@ -154,7 +154,7 @@ export default function Layout() {
         )}
 
         {/* View Content (Dashboard, Syllabus, etc) */}
-        <div className="flex-1 overflow-y-visible md:overflow-y-auto bg-slate-50/50 relative">
+        <div className="flex-1 overflow-y-auto md:h-[calc(100vh-72px)] md:overflow-hidden bg-slate-50/50 relative">
           <Outlet />
         </div>
       </main>
